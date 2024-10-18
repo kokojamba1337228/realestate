@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Full viewport height */
+            margin: 0;
+            background-color: #f0f0f0; /* Light background */
+        }
+
+        .registration-container {
+            background-color: #fff;
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Shadow */
+            padding: 30px; /* Padding around the form */
+            width: 400px; /* Fixed width for the form */
+            text-align: center; /* Center the text */
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="tel"] {
+            width: 100%; /* Full width */
+            padding: 10px; /* Padding inside text boxes */
+            margin: 10px 0; /* Space between input fields */
+            border: 1px solid #ccc; /* Light border */
+            border-radius: 5px; /* Rounded corners */
+            box-sizing: border-box; /* Include padding and border in element's total width and height */
+        }
+
+        button {
+            background-color: #007BFF; /* Blue background */
+            color: white; /* White text */
+            border: none; /* No border */
+            border-radius: 25px; /* Rounded button */
+            padding: 10px 20px; /* Padding inside the button */
+            cursor: pointer; /* Pointer on hover */
+            font-size: 16px; /* Button text size */
+            margin-top: 15px; /* Space above the button */
+        }
+
+        button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+        small {
+            display: block; /* Make small text a block to occupy space */
+            margin-top: 10px; /* Space above small text */
+            color: red; /* Red color for error message */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="registration-container">
+        <h2>Register</h2>
+        <form id="registrationForm" method="POST">
+            {% csrf_token %}
+            
+            <div>
+                {{ form.phone_number.label_tag }}  <!-- Label for the phone number field -->
+                {{ form.phone_number }}             <!-- Render the phone number field -->
+            </div>
+            <div>
+                {{ form.first_name.label_tag }}    <!-- Label for the first name field -->
+                {{ form.first_name }}               <!-- Render the first name field -->
+            </div>
+            <div>
+                {{ form.last_name.label_tag }}     <!-- Label for the last name field -->
+                {{ form.last_name }}                <!-- Render the last name field -->
+            </div>
+            <div>
+                {{ form.email.label_tag }}          <!-- Label for the email field -->
+                {{ form.email }}                     <!-- Render the email field -->
+            </div>
+            <div>
+                {{ form.password.label_tag }}       <!-- Label for the password field -->
+                {{ form.password }}                  <!-- Render the password field -->
+            </div>
+            <div>
+                {{ form.confirm_password.label_tag }}  <!-- Label for the confirm password field -->
+                {{ form.confirm_password }}              <!-- Render the confirm password field -->
+            </div>
+            <button type="submit" id="submitBtn">Register</button>
+        </form>
+    </div>
+
+    <script>
+        // Function to validate password match
+        function validatePasswordMatch() {
+            const password = document.getElementById('id_password');
+            const confirmPassword = document.getElementById('id_confirm_password');
+            const passwordMatchMessage = document.getElementById('passwordMatchMessage');
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Check if passwords match
+            if (password.value !== confirmPassword.value) {
+                passwordMatchMessage.style.display = 'block';  // Show message
+                submitBtn.disabled = true;  // Disable the submit button
+            } else {
+                passwordMatchMessage.style.display = 'none';  // Hide message
+                submitBtn.disabled = false;  // Enable the submit button
+            }
+        }
+
+        // Attach event listeners to password fields
+        document.getElementById('id_password').addEventListener('input', validatePasswordMatch);
+        document.getElementById('id_confirm_password').addEventListener('input', validatePasswordMatch);
+
+        // Phone number validation
+        document.getElementById('id_phone_number').addEventListener('input', function() {
+            const phoneNumber = this.value;
+            const phonePattern = /^(?:\+375)?(?:29|33|44|25|17)\d{7}$/;
+            
+            if (!phonePattern.test(phoneNumber)) {
+                this.setCustomValidity('Please enter a valid phone number (10-15 digits).');
+            } else {
+                this.setCustomValidity('');  // Reset the validity if the phone number is valid
+            }
+        });
+
+        // Email validation
+        document.getElementById('id_email').addEventListener('input', function() {
+            const email = this.value;
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;  // Basic email format validation
+
+            if (!emailPattern.test(email)) {
+                this.setCustomValidity('Please enter a valid email address.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        // Optional: prevent form submission if errors exist
+        document.getElementById('registrationForm').addEventListener('submit', function(event) {
+            if (document.getElementById('passwordMatchMessage').style.display === 'block') {
+                event.preventDefault();  // Prevent submission if passwords don't match
+            }
+        });
+    </script>
+
+</body>
+</html>
