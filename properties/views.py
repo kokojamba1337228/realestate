@@ -1,3 +1,4 @@
 from django.shortcuts import render
 
-# Create your views here.
+def property_list(request):
+    return render("properties/list")
