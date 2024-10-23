@@ -5,14 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация</title>
-    <link rel="stylesheet" href="{% static 'your_app/fontawesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'polls/fontawesome/css/all.min.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static "polls/scss/style.scss" %}">
 </head>
 <body>
-
     <div class="registration-container">
         <h2>Регистрация</h2>
         <form id="registrationForm" method="POST">
@@ -48,7 +47,9 @@
                 <input type="password" id="id_confirm_password" name="confirm_password" required placeholder=" ">
                 <label for="id_confirm_password" class="label-placeholder">Подтверждение пароля</label>
             </div>
-            <a href="{% url 'login' %}">Есть аккаунт? Войти</a>
+            <div>
+                Есть аккаунт?<a href="{% url 'login' %}"> Войти</a>
+            </div>  
             <button type="submit" id="submitBtn">Зарегистрироваться</button>
         </form>
     </div>
@@ -99,6 +100,7 @@
             }
         });
     </script>
+
 
 </body>
 </html>

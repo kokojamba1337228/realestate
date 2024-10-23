@@ -1,7 +1,9 @@
 from django import forms
 from .models import *
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
+
 
 class UserRegistrationForm(forms.ModelForm):
     phone_number = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Номер телефона', 'type': 'tel', 'value': '+375'}))
@@ -35,17 +37,16 @@ class LoginForm(forms.Form):
     identifier = forms.CharField(widget=forms.TextInput(attrs={
         'placeholder': 'Номер телефона или Email'
     }))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={
+    login_password = forms.CharField(widget=forms.PasswordInput(attrs={
         'placeholder': 'Пароль'
     }))
 
-    def clean(self):
-        cleaned_data = super().clean()
-        identifier = cleaned_data.get('identifier')
-        password = cleaned_data.get('password')
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = CustomUser
+        fields = ('email', 'phone_number')
 
-        if identifier and password:
-            user = authenticate(identifier=identifier, password=password)
-            if not user:
-                raise ValidationError('Неверный телефон, email или пароль.')
-        return cleaned_data
+class CustomUserChangeForm(UserChangeForm):
+    class Meta:
+        model = CustomUser
+        fields = ('email', 'phone_number')

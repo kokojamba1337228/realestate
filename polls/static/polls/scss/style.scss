@@ -1,6 +1,7 @@
 a {
     text-decoration: none;
-    color: inherit;
+    color: #1d789c;
+    font-weight: 600;
 }
 
 body {
@@ -20,53 +21,61 @@ body {
     padding: 30px;
     width: 400px;
     text-align: center;
+
 }
+
 
 .form-group {
     position: relative;
-    margin: 20px 0;
+    display: flex;
+    margin: 20px 0; 
 }
 
 input {
-    width: 100%;
-    padding: 12px 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-    transition: border-color 0.2s;
-    background-color: #fff;
-    outline: none;
-    border-bottom: 1px solid #ccc;
-    line-height: 1.5;
-    height: 40px;
+    width: 100%; 
+    padding: 12px 10px; 
+    padding-left: 40px;
+    border: 1px solid #ccc; 
+    border-radius: 5px; 
+    box-sizing: border-box; 
+    transition: border-color 0.2s; 
+    background-color: #fff; 
+    outline: none; 
+    line-height: 1.5; 
+    height: 40px; 
 }
 
 .form-icon {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #999;
+    position: absolute; 
+    left: 10px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    color: #999; 
+    pointer-events: none; 
 }
 
-.label-placeholder {
-    cursor: auto;
-    position: absolute;
-    left: 10px;
-    top: 10px;
-    font-size: 16px;
-    color: #999;
-    transition: 0.2s ease all;
-    background-color: white;
-    padding: 0 5px;
+input:focus ~ .form-icon {
+    color: #292929; 
 }
 
 input:focus + .label-placeholder,
 input:not(:placeholder-shown) + .label-placeholder {
     top: -10px;
-    left: 10px;
-    font-size: 14px;
+    left: 30px;
+    font-size: 15px;
     color: #848282;
+}
+
+.label-placeholder {
+    cursor: auto;
+    position: absolute;
+    left: 40px; 
+    top: 10px;
+    font-size: 17px;
+    color: #999;
+    transition: 0.2s ease all;
+    background-color: white;
+    padding: 0 5px;
 }
 
 input:focus {
@@ -74,7 +83,7 @@ input:focus {
 }
 
 button {
-    transition: all .25s;
+    transition: all .20s;
     background-color: #ff2e2e;
     color: white;
     border: none;
@@ -84,11 +93,12 @@ button {
     cursor: pointer;
     font-size: 18px;
     margin-top: 15px;
+    font-weight: bold;
 }
 
 button:hover {
     background-color: #da2929;
-    transition: all .25s linear;
+    transition: all .20s linear;
 }
 
 small {
