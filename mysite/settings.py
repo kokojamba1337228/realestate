@@ -45,7 +45,7 @@ INSTALLED_APPS = [
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  
-    'polls.backends.EmailOrPhoneBackend',
+    #'polls.backends.EmailOrPhoneBackend',
 )
 
 # Use the custom User model

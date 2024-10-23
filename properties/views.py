@@ -1,4 +1,4 @@
 from django.shortcuts import render
 
 def property_list(request):
-    return render("properties/list")
+    return render(request, "properties/home_page.html")
