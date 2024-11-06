@@ -55,7 +55,13 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ['first_name', 'last_name', 'email', 'phone_number', 'avatar']
-        
+        labels = {
+            'first_name': 'Имя', 
+            'last_name': 'Фамилия', 
+            'phone_number': 'Номер телефона', 
+            'email': 'Электронная почта', 
+            'avatar': 'Фото профиля'
+        }
     def __init__(self, *args, **kwargs):
         super(UserProfileForm, self).__init__(*args, **kwargs)
         self.fields['first_name'].widget.attrs.update({'class': 'form-control'})

@@ -1,15 +1,15 @@
 body {
     font-family: 'Montserrat', sans-serif;
     background-color: #f4f4f4;
-    margin: 0;
     padding: 0;
 }
 
 .container {
     width: 100%;
+    max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-    position: absolute;
+    position: relative;
     transform: translate(0%, 10%);
 }
 
@@ -43,11 +43,6 @@ form label {
     outline: none;
 }
 
-.form-control-file {
-    margin-bottom: 15px;
-    font-size: 16px;
-}
-
 .btn {
     background-color: #ff2e2e;
     color: white;
@@ -55,6 +50,8 @@ form label {
     padding: 10px 20px;
     border-radius: 5px;
     font-size: 16px;
+    font-weight: bold;
+    margin-top: 2%;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
@@ -63,19 +60,50 @@ form label {
     background-color: #e62e2e;
 }
 
-.btn-secondary {
-    background-color: #555;
-    color: white;
+.tabs {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 1rem;
 }
 
-.btn-secondary:hover {
-    background-color: #444;
+.tab {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    color: #535353;
+    transition: color 0.3s;
+    position: relative;
 }
+
+.tab:hover {
+    color: #181818;
+    cursor: pointer;
+}
+
+.active-tab {
+    color: #000000;
+    border-bottom: 2px solid rgb(0, 0, 0);
+}
+
+.vertical-divider {
+    width: 1px;
+    height: 20px;
+    background-color: #ccc;
+    margin: 0 1rem;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
 
 .property-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+    display: block;  
     margin-top: 20px;
 }
 
@@ -85,40 +113,47 @@ form label {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    margin-bottom: 20px;
 }
 
 .property-card:hover {
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.008);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-.h2 {
-    text-decoration: none;
-    color: #333;
-    font-weight: 700;
-    margin: 30px;
+.property-card .favorite-btn-wrapper {
+    position: absolute;
+    top: 10px;
+    right: 10px;
 }
 
-.property-card p {
-    text-decoration: none;
-    margin: 10px 0;
-    color: #555;
-}
-
-.property-card p strong {
-    color: #333;
-    font-weight: bold;
-}
-
-hr {
+.delete-favorite-btn, .delete-property-btn {
+    background-color: #ff2e2e;
     border: none;
-    border-top: 1px solid #ccc;
-    margin: 20px 0;
+    color: white;
+    font-size: 16px;
+    padding: 5px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-.title {
+.delete-favorite-btn:hover, .delete-property-btn:hover {
+    background-color: #e62e2e;
+}
+
+.property-link {
     text-decoration: none;
-    margin-top: 0;
+    color: inherit;
+}
+
+.property-link .title {
     font-size: 20px;
     font-weight: bold;
+    color: #333;
+}
 
+.property-link p {
+    color: #555;
 }

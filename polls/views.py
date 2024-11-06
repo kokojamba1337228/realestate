@@ -7,18 +7,42 @@ from polls.backends import EmailOrPhoneBackend
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 from properties.models import Property 
+import json
 
 User = get_user_model()
 
 @login_required
-def delete_favorite(request, property_id):
-    if request.method == "DELETE":
-        property_instance = get_object_or_404(Property, id=property_id)
-        request.user.favorites.remove(property_instance)
-        return JsonResponse({'status': 'deleted'})
-    return JsonResponse({'error': 'Invalid request method'}, status=400)
+@csrf_exempt
+def delete_property(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        property_id = data.get('property_id')
 
+        try:
+            property = Property.objects.get(id=property_id, owner=request.user)
+            property.delete()
+            return JsonResponse({'status': 'deleted'})
+        except Property.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Property not found'})
+
+@login_required
+@csrf_exempt
+def delete_favorite(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        property_id = data.get('property_id')
+
+        try:
+            property = Property.objects.get(id=property_id)
+            user = request.user
+            user.favorites.remove(property)
+            return JsonResponse({'status': 'removed'})
+        except Property.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Property not found'})
+        
+        
 def user_register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -70,17 +94,19 @@ def user_logout(request):
 @login_required
 def profile_view(request):
     user = request.user
-    form = UserProfileForm(instance=user)  
+    form = UserProfileForm(instance=user)
 
     if request.method == 'POST':
         form = UserProfileForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
-            return redirect('profile')  
+            return redirect('profile')
 
     favorite_properties = user.favorites.all()
+    user_properties = Property.objects.filter(owner=user)
 
     return render(request, 'polls/profile.html', {
         'form': form,
-        'favorite_properties': favorite_properties
+        'favorite_properties': favorite_properties,
+        'user_properties': user_properties
     })

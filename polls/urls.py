@@ -7,4 +7,5 @@ urlpatterns = [
     path('log-in/', user_login, name='login'),
     path('log-out/', user_logout, name='logout'), 
     path('profile/', profile_view, name='profile'),
-    path('profile/delete_favorite/<int:property_id>/', delete_favorite, name='delete_favorite'),]
+    path('delete-favorite/', delete_favorite, name='delete_favorite'),
+    path('delete-property/', delete_property, name='delete_property'),]

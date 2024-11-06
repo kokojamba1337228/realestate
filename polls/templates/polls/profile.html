@@ -16,59 +16,138 @@
     {% include 'polls/elements/header.html' %}
 
     <div class="container">
-        <h2>Профиль пользователя</h2>
+        <h2>Ваш профиль</h2>
         <form method="POST">
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="btn btn-primary">Сохранить изменения</button>
         </form>
 
-        <h3>Понравившиеся</h3>
+        <div class="tabs">
+            <div id="favorites-tab" class="tab active-tab" onclick="showSection('favorites')">
+                Понравившиеся
+            </div>
+            <div class="vertical-divider"></div>
+            <div id="my-ads-tab" class="tab" onclick="showSection('my-ads')">
+                Мои объявления
+            </div>
+        </div>
+
         <hr>
-        <div class="property-list">
-            {% for property in favorite_properties %}
-            <div class="property-card" data-property-id="{{ property.id }}">                
-                <div class="favorite-btn-wrapper">
-                    <button type="button" class="favorite-btn">
-                        <i class="fa-heart fas"></i>
+        
+        <div id="favorites-section" class="tab-content active">
+            <div class="property-list">
+                {% for property in favorite_properties %}
+                <div class="property-card" data-property-id="{{ property.id }}">
+                    <div class="favorite-btn-wrapper">
+                        <button type="button" class="delete-favorite-btn" onclick="deleteFavorite({{ property.id }})">
+                            <i class="fa-heart fas"></i>
+                        </button>
+                    </div>
+                    <a href="{% url 'property_detail' property.id %}" class="property-link">
+                        <h4 class="title">{{ property.title }}</h4>
+                        <p><strong>Цена:</strong> ${{ property.price }}</p>
+                        <p><strong>Адрес:</strong> {{ property.location }}</p>
+                        <p><strong>Площадь:</strong> {{ property.size }} м²</p>
+                        <p>{{ property.description|truncatewords:20 }}</p>
+                    </a>
+                </div>
+                {% empty %}
+                    <p>Нет понравившихся предложений.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="my-ads-section" class="tab-content" style="display: none;">
+            <div class="property-list">
+                {% for property in user_properties %}
+                <div class="property-card" data-property-id="{{ property.id }}">
+                    <a href="{% url 'property_detail' property.id %}" class="property-link">
+                        <p class="title">{{ property.title }}</p>
+                        <p><strong>Цена:</strong> ${{ property.price }}</p>
+                        <p><strong>Адрес:</strong> {{ property.location }}</p>
+                        <p><strong>Площадь:</strong> {{ property.size }} м²</p>
+                        <p>{{ property.description|truncatewords:20 }}</p>
+                    </a>
+                    <button type="button" class="delete-property-btn" onclick="confirmDeleteProperty({{ property.id }})">
+                        Удалить
                     </button>
                 </div>
-                <a href="{% url 'property_detail' property.id %}">
-                <a class="title">{{ property.title }}</a>
-                <p><strong>Цена:</strong> ${{ property.price }}</p>
-                <p><strong>Адрес:</strong> {{ property.location }}</p>
-                <p><strong>Площадь:</strong> {{ property.size }} м²</p>
-                <p>{{ property.description|truncatewords:20 }}</p>
-                </a>
-            </div>           
-            {% empty %}
-                <p>Нет понравившихся предложений.</p>
-            {% endfor %}
+                {% empty %}
+                    <p>У вас пока нет объявлений.</p>
+                {% endfor %}
+            </div>
         </div>
     </div>
-    
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelectorAll('.favorite-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const propertyId = this.closest('.property-card').dataset.propertyId;
-                    const propertyCard = this.closest('.property-card');
 
-                    fetch(`/user/account/delete_favorite/${propertyId}/`, { 
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRFToken': '{{ csrf_token }}',
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'deleted') {
-                            propertyCard.remove();
-                        }
-                    });
-                });
-            });
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const savedTab = localStorage.getItem('selectedTab') || 'favorites';
+            showSection(savedTab);
         });
+
+        function deleteFavorite(propertyId) {
+            fetch('{% url "delete_favorite" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ property_id: propertyId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'removed') {
+                    const propertyCard = document.querySelector(`.property-card[data-property-id="${propertyId}"]`);
+                    propertyCard.remove();
+                }
+            });
+        }
+
+        function confirmDeleteProperty(propertyId) {
+            if (confirm("Вы уверены, что хотите удалить это объявление?")) {
+                deleteProperty(propertyId);
+            }
+        }
+
+        function deleteProperty(propertyId) {
+            fetch('{% url "delete_property" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ property_id: propertyId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'deleted') {
+                    const propertyCard = document.querySelector(`.property-card[data-property-id="${propertyId}"]`);
+                    propertyCard.remove();
+                }
+            });
+        }
+
+        function showSection(section) {
+            const favoritesTab = document.getElementById('favorites-tab');
+            const myAdsTab = document.getElementById('my-ads-tab');
+            const favoritesSection = document.getElementById('favorites-section');
+            const myAdsSection = document.getElementById('my-ads-section');
+            
+            localStorage.setItem('selectedTab', section);
+
+            if (section === 'favorites') {
+                favoritesTab.classList.add('active-tab');
+                myAdsTab.classList.remove('active-tab');
+                favoritesSection.style.display = 'block';
+                myAdsSection.style.display = 'none';
+            } else {
+                myAdsTab.classList.add('active-tab');
+                favoritesTab.classList.remove('active-tab');
+                myAdsSection.style.display = 'block';
+                favoritesSection.style.display = 'none';
+            }
+        }
     </script>
 </body>
 </html>
