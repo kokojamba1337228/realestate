@@ -25,13 +25,13 @@
                                 <i class="fa-heart {% if property.id in favorite_properties %}fas{% else %}far{% endif %}"></i>
                             </button>
                     </div>
-                    <a href="{% url 'property_detail' property.id %}">
-                    <a class="title">{{ property.title }}</a>
-                    <p><strong>Цена:</strong> {{ property.price }} BYN</p>
-                    <p><strong>Адрес:</strong> {{ property.location }}</p>
-                    <p><strong>Площадь:</strong> {{ property.size }} м²</p>
-                    <p>{{ property.description }}</p>
-                </a>
+                    <a href="{% url 'property_detail' property.id %}" class="property-link">
+                        <p class="title">{{ property.title }}</p>
+                        <p><strong>Цена:</strong> {{ property.price }} BYN</p>
+                        <p><strong>Адрес:</strong> {{ property.location }}</p>
+                        <p><strong>Площадь:</strong> {{ property.size }} м²</p>
+                        <p>{{ property.description }}</p>
+                    </a>
                 </div>
             {% empty %}
                 <p>Нет доступных объектов недвижимости</p>

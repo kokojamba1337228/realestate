@@ -12,7 +12,6 @@ body {
 }
 
 h2 {
-    text-decoration: none;
     color: #333;
     font-weight: 700;
     margin: 30px;
@@ -34,6 +33,11 @@ h2 {
 
 .property-card:hover {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+a{
+    text-decoration: none;
+    color: #333;
 }
 
 .favorite-btn-wrapper {
