@@ -23,11 +23,11 @@
         </div>
         <nav class="nav">
             <ul>
-                <li><a href="#">Купить</a></li>
+                <li><a href="{% url 'home_page' %}">Купить</a></li>
                 <li><a href="#">Арендовать</a></li>
                 <li><a href="{% url 'add_property' %}">Продать</a></li>
                 <li><a href="#">Новые предложения</a></li>
-                <li><a href="#">Аккаунт</a></li>
+                <li><a href="{% url 'profile' %}">Аккаунт</a></li>
             </ul>
         </nav>
         <div class="auth-buttons">

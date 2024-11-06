@@ -70,15 +70,14 @@ def user_logout(request):
 @login_required
 def profile_view(request):
     user = request.user
+    form = UserProfileForm(instance=user)  
+
     if request.method == 'POST':
         form = UserProfileForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
-            return redirect('profile')  # Redirect to profile page after saving
-    else:
-        form = UserProfileForm(instance=user)
-    
-    # Fetch the user's favorite properties
+            return redirect('profile')  
+
     favorite_properties = user.favorites.all()
 
     return render(request, 'polls/profile.html', {
