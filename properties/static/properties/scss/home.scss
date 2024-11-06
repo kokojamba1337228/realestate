@@ -1,0 +1,81 @@
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+}
+
+h2 {
+    text-decoration: none;
+    color: #333;
+    font-weight: 700;
+    margin: 30px;
+}
+
+.property-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.property-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.property-card:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.favorite-btn-wrapper {
+    top: 15px;
+    right: 15px;
+}
+
+.property-card p {
+    text-decoration: none;
+    margin: 10px 0;
+    color: #555;
+}
+
+.favorite-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+.favorite-btn i {
+    font-size: 20px; 
+    color: #ff2e2e; 
+}
+
+.favorite-btn i.far {
+    color: #ccc; 
+}
+
+.favorite-btn:hover i {
+    color: #ff0000; 
+}
+
+.property-card p strong {
+    color: #333;
+    font-weight: bold;
+}
+
+.title {
+    text-decoration: none;
+    margin-top: 0;
+    font-size: 20px;
+    font-weight: bold;
+
+}

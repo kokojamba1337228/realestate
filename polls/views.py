@@ -1,11 +1,23 @@
 from django.shortcuts import render, redirect
-from .forms import UserRegistrationForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from .forms import LoginForm
+from .forms import *
 from polls.backends import EmailOrPhoneBackend
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from properties.models import Property 
+
 User = get_user_model()
+
+@login_required
+def delete_favorite(request, property_id):
+    if request.method == "DELETE":
+        property_instance = get_object_or_404(Property, id=property_id)
+        request.user.favorites.remove(property_instance)
+        return JsonResponse({'status': 'deleted'})
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 def user_register(request):
     if request.method == 'POST':
@@ -54,3 +66,22 @@ def user_login(request):
 def user_logout(request):
     logout(request) 
     return redirect('login')
+
+@login_required
+def profile_view(request):
+    user = request.user
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')  # Redirect to profile page after saving
+    else:
+        form = UserProfileForm(instance=user)
+    
+    # Fetch the user's favorite properties
+    favorite_properties = user.favorites.all()
+
+    return render(request, 'polls/profile.html', {
+        'form': form,
+        'favorite_properties': favorite_properties
+    })
