@@ -1,28 +1,22 @@
-a {
-    text-decoration: none;
-    color: #1d789c;
-    font-weight: 600;
-}
-
 body {
     font-family: "Montserrat", sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
     background-color: #f0f0f0;
 }
 
-.registration-container {
+.container {
     background-color: #fff;
+    padding: 30px;
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    padding: 30px;
     width: 400px;
     text-align: center;
-
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
+
 
 .form-group {
     position: relative;
@@ -43,18 +37,26 @@ input:focus ~ .form-icon {
     color: #292929; 
 }
 
-input {
-    width: 100%; 
-    padding: 12px 10px; 
-    padding-left: 35px;
-    border: 1px solid #ccc; 
-    border-radius: 5px; 
-    box-sizing: border-box; 
-    transition: border-color 0.2s; 
-    background-color: #fff; 
-    outline: none; 
-    line-height: 1.5; 
-    height: 40px; 
+input:focus ~ .form-icon-des {
+    color: #292929; 
+}
+
+.form-icon-des{
+    position: absolute; 
+    left: 10px; 
+    transform: translateY(-50%); 
+    top: 25%;
+    color: #999; 
+    pointer-events: none; 
+}
+
+input, textarea {
+    resize: none;
+    width: 100%;
+    padding: 12px;
+    padding-left: 35px; 
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 
 input:focus + .label-placeholder,
@@ -64,6 +66,15 @@ input:not(:placeholder-shown) + .label-placeholder {
     font-size: 15px;
     color: #848282;
 }
+
+textarea:focus + .label-placeholder,
+textarea:not(:placeholder-shown) + .label-placeholder {
+    top: -10px;
+    left: 30px;
+    font-size: 15px;
+    color: #848282;
+}
+
 
 .label-placeholder {
     cursor: auto;
@@ -87,7 +98,7 @@ button {
     color: white;
     border: none;
     border-radius: 10px;
-    width: 60%;
+    width: 70%;
     padding: 10px 20px;
     cursor: pointer;
     font-size: 18px;
@@ -98,10 +109,4 @@ button {
 button:hover {
     background-color: #da2929;
     transition: all .20s linear;
-}
-
-small {
-    display: block;
-    margin-top: 10px;
-    color: red;
 }
