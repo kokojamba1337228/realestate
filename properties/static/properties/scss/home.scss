@@ -1,0 +1,83 @@
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+}
+
+h2 {
+    color: #333;
+    font-weight: 700;
+    margin: 30px;
+}
+
+.property-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+    gap: 20px;
+}
+
+.property-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative; /* Important for positioning favorite icon correctly */
+}
+
+.property-card:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.008);
+}
+
+a {
+    text-decoration: none;
+    color: #333;
+}
+
+.favorite-btn-wrapper {
+    position: absolute; /* Position the heart icon at the top right of the card */
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+}
+
+.favorite-btn {
+    font-size: 24px;
+    color: #ccc; /* Default color */
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.favorite-btn.fas {
+    color: #ff2e2e; /* Red color for filled heart */
+}
+
+.favorite-btn:hover {
+    color: #ff0000; /* Hover color */
+}
+
+.property-card p {
+    text-decoration: none;
+    margin: 10px 0;
+    color: #555;
+}
+
+.property-card p strong {
+    color: #333;
+    font-weight: bold;
+}
+
+.title {
+    text-decoration: none;
+    margin-top: 0;
+    font-size: 20px;
+    font-weight: bold;
+}
