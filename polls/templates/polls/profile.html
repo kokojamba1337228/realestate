@@ -1,0 +1,74 @@
+{% load static %}
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'polls/fontawesome/css/all.min.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'polls/scss/user_profile.scss' %}">
+    <title>Профиль пользователя</title>
+</head>
+
+<body>
+    {% include 'polls/elements/header.html' %}
+
+    <div class="container">
+        <h2>Профиль пользователя</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        </form>
+
+        <h3>Понравившиеся</h3>
+        <hr>
+        <div class="property-list">
+            {% for property in favorite_properties %}
+            <div class="property-card" data-property-id="{{ property.id }}">                
+                <div class="favorite-btn-wrapper">
+                    <button type="button" class="favorite-btn">
+                        <i class="fa-heart fas"></i>
+                    </button>
+                </div>
+                <a href="{% url 'property_detail' property.id %}">
+                <a class="title">{{ property.title }}</a>
+                <p><strong>Цена:</strong> ${{ property.price }}</p>
+                <p><strong>Адрес:</strong> {{ property.location }}</p>
+                <p><strong>Площадь:</strong> {{ property.size }} м²</p>
+                <p>{{ property.description|truncatewords:20 }}</p>
+                </a>
+            </div>           
+            {% empty %}
+                <p>Нет понравившихся предложений.</p>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('.favorite-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const propertyId = this.closest('.property-card').dataset.propertyId;
+                    const propertyCard = this.closest('.property-card');
+
+                    fetch(`/user/account/delete_favorite/${propertyId}/`, { 
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'deleted') {
+                            propertyCard.remove();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,38 +1,72 @@
 {% load static %}
-{% load bootstrap5 %}
-<html lang="en">
+<html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'properties/fontawesome/css/all.min.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static "/properties/scss/style.scss" %}">
-
-    <title>Список недвижимости</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'properties/scss/home.scss' %}">
+    <title>Список недвижимости</title>   
 </head>
 <body>
-    <header class="header">
-        <div class="logo">
-            <a href="{% url 'home_page'%}">
-                <i class="fas fa-home"></i> 
-                <span>realestate.by</span>
-            </a>
+    {% include 'properties/elements/header.html' %}
+
+    <div class="container">
+        <h2 class >Доступная недвижимость</h2>
+        <div class="property-list">
+            {% for property in properties %}
+                <div class="property-card" data-property-id="{{ property.id }}">
+                    <div class="favorite-btn-wrapper">
+                            {% csrf_token %}
+                            <button type="submit" class="favorite-btn">
+                                <i class="fa-heart {% if property.id in favorite_properties %}fas{% else %}far{% endif %}"></i>
+                            </button>
+                    </div>
+                    <a href="{% url 'property_detail' property.id %}" class="property-link">
+                        <p class="title">{{ property.title }}</p>
+                        <p><strong>Цена:</strong> {{ property.price }} BYN</p>
+                        <p><strong>Адрес:</strong> {{ property.location }}</p>
+                        <p><strong>Площадь:</strong> {{ property.size }} м²</p>
+                        <p>{{ property.description }}</p>
+                    </a>
+                </div>
+            {% empty %}
+                <p>Нет доступных объектов недвижимости</p>
+            {% endfor %}
         </div>
-        <nav class="nav">
-            <ul>
-                <li><a href="#">Купить</a></li>
-                <li><a href="#">Арендовать</a></li>
-                <li><a href="#">Продать</a></li>
-                <li><a href="#">Новые предложения</a></li>
-                <li><a href="#">Аккаунт</a></li>
-            </ul>
-        </nav>
-        <div class="auth-buttons">
-            <a href="{% url 'login'%}" class="sign-in">Войти</a>
-            <a href="{% url 'register'%}" class="join">Регистрация</a>
-        </div>
-    </header>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('.favorite-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const propertyId = this.closest('.property-card').dataset.propertyId;
+                    const heartIcon = this.querySelector('i');
+
+                    fetch(window.location.href, { 
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                        body: JSON.stringify({ property_id: propertyId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'added') {
+                            heartIcon.classList.remove('far');
+                            heartIcon.classList.add('fas');
+                        } else if (data.status === 'removed') {
+                            heartIcon.classList.remove('fas');
+                            heartIcon.classList.add('far');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 </body>
 </html>
