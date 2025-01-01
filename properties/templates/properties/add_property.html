@@ -35,7 +35,7 @@
 
             <div class="form-group">
                 <i class="fas fa-dollar-sign form-icon"></i>
-                <input type="number" id="id_price" name="price" step="1" placeholder="">
+                <input type="number" id="id_price" name="price" step="1" placeholder=" ">
                 <label for="id_price" class="label-placeholder">Цена</label>
             </div>
 
@@ -50,10 +50,15 @@
                 <input type="number" id="id_size" name="size" step="0.1" placeholder=" ">
                 <label for="id_size" class="label-placeholder">Площадь</label>
             </div>
+            <p class="picture">Изображения</p>
 
             <div class="form-group">
-                <input type="file" id="id_images" name="images" accept="image/*" multiple>
-                <label for="id_images" class="label-placeholder">Загрузить изображения</label>
+                <div id="imageUploadArea" class="image-upload-area">
+                    <input type="file" id="id_images" name="images" accept="image/*" multiple>
+                    <div class="upload-placeholder">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                </div>
             </div>
             <div id="imagePreviewContainer" class="image-preview-container"></div>
 
@@ -65,35 +70,56 @@
     {% include 'properties/elements/footer.html' %}
 
     <script>
-        document.getElementById('id_images').addEventListener('change', function(event) {
-            const container = document.getElementById('imagePreviewContainer');
-            container.innerHTML = ''; 
-
-            Array.from(event.target.files).forEach((file, index) => {
+        document.getElementById('id_images').addEventListener('change', function (event) {
+            const container = document.getElementById('imageUploadArea');
+            const files = Array.from(event.target.files);
+        
+            if (container.querySelectorAll('.image-preview').length + files.length > 10) {
+                alert('максимум 10 изображений.');
+                return;
+            }
+        
+            files.forEach((file) => {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+        
+                reader.onload = function (e) {
                     const div = document.createElement('div');
                     div.classList.add('image-preview');
-
+        
                     const img = document.createElement('img');
                     img.src = e.target.result;
                     img.alt = 'Image Preview';
-
+        
                     const removeButton = document.createElement('button');
                     removeButton.classList.add('remove-button');
                     removeButton.innerHTML = '&times;';
-                    removeButton.onclick = function() {
-                        div.remove(); // Remove preview
-                        event.target.files[index] = null; // Mark file as removed
+                    removeButton.onclick = function () {
+                        div.remove();
+                        adjustPlaceholder();
                     };
-
+        
                     div.appendChild(img);
                     div.appendChild(removeButton);
-                    container.appendChild(div);
+                    container.insertBefore(div, container.querySelector('.upload-placeholder'));
+                    adjustPlaceholder();
                 };
+        
                 reader.readAsDataURL(file);
             });
         });
+        
+        function adjustPlaceholder() {
+            const container = document.getElementById('imageUploadArea');
+            const previews = container.querySelectorAll('.image-preview').length;
+        
+            const placeholder = container.querySelector('.upload-placeholder');
+            if (previews >= 10) {
+                placeholder.style.display = 'none';
+            } else {
+                placeholder.style.display = 'flex';
+            }
+        }
+        
     </script>
 
 </body>

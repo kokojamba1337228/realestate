@@ -10,12 +10,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-
 </head>
 <body>
-
     <div class="registration-container">
         <h2>Вход</h2>
+
+        <div class="alert-messages">
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        </div>
+
         <form id="loginForm" method="POST">
             {% csrf_token %}
             <div class="form-group">
@@ -29,12 +34,11 @@
                 <label for="id_password" class="label-placeholder">Пароль</label>
             </div>
             <div>
-                Еще нет аккаунт?<a href="{% url 'register' %}"> Создать</a>
+                Еще нет аккаунта? <a href="{% url 'register' %}">Создать</a>
             </div>  
             <button type="submit" id="submitBtn">Войти</button>
         </form>
     </div>
-    
     <script>
         document.getElementById('loginForm').addEventListener('submit', function(event) {
             const identifier = document.getElementById('identifier').value;
@@ -49,6 +53,6 @@
             }
         });
     </script>
-
 </body>
 </html>
+

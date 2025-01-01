@@ -31,7 +31,12 @@
         <p><strong>Номер продавца:</strong> {{ property.owner.phone_number }}</p>
         <p><strong>Email продавца:</strong> {{ property.owner.email }}</p>
         <p><strong class="description">Описание:</strong> {{ property.description }}</p>
-
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" name="create_chat" class="btn btn-primary mt-3 start-chat">
+                Начать чат с продавцом
+            </button>
+        </form>
 
     </div>
 {% endblock %}

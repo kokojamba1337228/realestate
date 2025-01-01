@@ -1,0 +1,59 @@
+{% load static %}
+{% load bootstrap5 %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'chat/fontawesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'chat/scss/chat_detail.scss' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    {% include 'properties/elements/header.html' %}
+
+    <div class="chat-container">
+        <h2>Чат о {{ chat.property.title }}</h2>
+
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                    <p><strong>{{ message.sender.first_name }}:</strong> {{ message.content }}</p>
+                    <p><small>{{ message.created_at }}</small></p>
+                </div>
+            {% empty %}
+                <p>Нет сообщений.</p>
+            {% endfor %}
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="send-container">
+            <textarea name="message" placeholder="Напишите сообщение..." required></textarea>
+            <button type="submit">Отправить</button>
+            </div>
+        </form>
+    </div>
+    {% include 'properties/elements/footer.html' %}
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const textarea = document.querySelector("textarea[name='message']");
+            const form = document.querySelector("form");
+    
+            textarea.addEventListener("keydown", (event) => {
+                if (event.key === "Enter") {
+                    if (event.shiftKey) {
+                        return;
+                    } else {
+                        event.preventDefault();
+                        form.submit();
+                    }
+                }
+            });
+        });
+    </script>
+    
+</body>
+</html>

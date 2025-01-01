@@ -17,6 +17,76 @@ h2 {
     margin-bottom: 2%;
 }
 
+.search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+    gap: 10px;
+}
+
+.filter-button {
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.filter-button:hover {
+    background-color: #555;
+}
+
+.filter-container {
+    display: flex;
+    justify-content: flex-end; 
+    align-items: center;
+}
+
+.filter-menu {
+    display: none;
+    position: absolute;
+    top: 7%;
+    right: 5%;
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: 300px;
+    z-index: 10;
+}
+
+.filter-menu label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.filter-menu input, .filter-menu select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.filter-submit {
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.filter-submit:hover {
+    background-color: #555;
+}
+
 .property-list {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
@@ -26,11 +96,13 @@ h2 {
 .search-form {
     display: flex;
     justify-content: center;
+    align-items: center;
     margin: 20px 0;
+    gap: 10px;
 }
 
 .search-input {
-    width: 300px;
+    width: 600px;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
@@ -39,7 +111,6 @@ h2 {
 
 .search-button {
     padding: 10px 20px;
-    margin-left: 10px;
     border: none;
     background-color: #333;
     color: #fff;
@@ -51,7 +122,6 @@ h2 {
 .search-button:hover {
     background-color: #555;
 }
-
 
 .property-card {
     background-color: #fff;
@@ -78,7 +148,7 @@ h2 {
     transition: transform 0.2s ease;
 }
 
-.property-image:hover{
+.property-image:hover {
     transform: scale(1.01);
 }
 
@@ -87,19 +157,18 @@ h2 {
     transform: scale(1.006);
 }
 
-
 a {
     text-decoration: none;
 }
 
 .favorite-btn-wrapper {
     position: absolute; 
-    top: 85%;
-    right: 10px;
+    top: 89%;
+    right: 3%;
 }
 
 .favorite-btn {
-    font-size: 26px;
+    font-size: 30px;
     color: #ccc; 
     cursor: pointer;
     transition: color 0.2s ease;
@@ -128,4 +197,66 @@ a {
     text-decoration: none;
     font-size: 22px;
     font-weight: bold;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+    margin: 10px 0;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+    height: 8px;
+    background: #ddd;
+    border-radius: 5px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #333;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+input[type="range"]::-moz-range-track {
+    height: 8px;
+    background: #ddd;
+    border-radius: 5px;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #333;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+select {
+    padding: 8px;
+    font-size: 1rem;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+}
+
+option {
+    padding: 8px;
+}
+
+button[type="submit"], .search-button, .filter-submit {
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover, .search-button:hover, .filter-submit:hover {
+    background-color: #555;
 }

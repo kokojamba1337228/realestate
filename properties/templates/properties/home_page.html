@@ -11,23 +11,50 @@
     <link rel="stylesheet" href="{% static 'properties/scss/home.scss' %}">
     <title>Доступные объявления</title>   
 </head>
+
 <body>
     {% include 'properties/elements/header.html' %}
 
     <div class="container">
-        <!-- Search Bar -->
-        <form method="get" action="" class="search-form">
-            <input
-                type="text"
-                name="query"
-                class="search-input"
-                placeholder="Поиск недвижимости по названию..."
-                value="{{ query|default:'' }}"
-            >
-            <button type="submit" class="search-button">Найти</button>
-        </form>
-
-        <h2 class>Доступная недвижимость</h2>
+        <div class="search-container">
+            <form method="get" action="{% url 'home_page' %}" class="search-form">
+                <input
+                    type="text"
+                    name="query"
+                    class="search-input"
+                    placeholder="Поиск по названию"
+                    value="{{ query|default:'' }}"
+                >
+                <button type="submit" class="search-button">Искать</button>
+            </form>
+    
+            <div class="filter-container">
+                <button id="filter-btn" class="filter-button">Фильтры</button>
+                <div id="filter-menu" class="filter-menu" style="display: none;">
+                    <form method="get" action="{% url 'home_page' %}" class="filter-form">
+                        <div class="filter-item">
+                            <label for="price-min">Цена от:</label>
+                            <input type="range" name="price_min" id="price-min" class="filter-input" min="0" max="{{ max_price }}" value="{{ price_min|default:0 }}" step="1" oninput="updatePriceDisplay()">
+                            <span id="price-min-display">{{ price_min|default:"0" }}</span> BYN -                        </div>
+                        <div class="filter-item">
+                            <label for="price-max">Цена до:</label>
+                            <input type="range" name="price_max" id="price-max" class="filter-input" min="0" max="{{ max_price }}" value="{{ price_max|default:max_price }}" step="1" oninput="updatePriceDisplay()">
+                            <span id="price-max-display">{{ price_max|default:max_price }}</span> BYN
+                        </div>
+                        <div class="filter-item">
+                            <label for="sorting">Сортировать по:</label>
+                            <select name="sorting" id="sorting" class="filter-input">
+                                <option value="price_asc" {% if sorting == 'price_asc' %}selected{% endif %}>Цена: от низкой к высокой</option>
+                                <option value="price_desc" {% if sorting == 'price_desc' %}selected{% endif %}>Цена: от высокой к низкой</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="filter-submit">Применить фильтры</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    
+        <h2>Доступная недвижимость</h2>
         <div class="property-list">
             {% for property in properties %}
                 <div class="property-card" data-property-id="{{ property.id }}">
@@ -60,7 +87,27 @@
     </div>
 
     <script>
-        
+        document.getElementById('filter-btn').addEventListener('click', function (event) {
+            const menu = document.getElementById('filter-menu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+            event.stopPropagation();
+        });
+
+        document.addEventListener('click', function (event) {
+            const menu = document.getElementById('filter-menu');
+            const filterButton = document.getElementById('filter-btn');
+            if (!filterButton.contains(event.target) && !menu.contains(event.target)) {
+                menu.style.display = 'none';
+            }
+        });
+
+        function updatePriceDisplay() {
+            const priceMin = document.getElementById('price-min');
+            const priceMax = document.getElementById('price-max');
+            document.getElementById('price-min-display').textContent = priceMin.value;
+            document.getElementById('price-max-display').textContent = priceMax.value;
+        }
+
         function removeFavorite(propertyId) {
             const heartIcon = document.querySelector(`.property-card[data-property-id="${propertyId}"] .favorite-btn`);
             fetch(window.location.href, { 
@@ -83,7 +130,7 @@
             });
         }
     </script>
-    {% include 'properties/elements/footer.html' %}
 
+    {% include 'properties/elements/footer.html' %}
 </body>
 </html>

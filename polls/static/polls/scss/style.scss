@@ -117,6 +117,22 @@ button:hover {
     font-size: 14px;
 }
 
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    cursor: pointer;
+    font-size: 18px;
+    pointer-events: auto;
+}
+
+.password-toggle.active {
+    color: #292929;
+}
+
+
 .form-error {
     color: #d9534f;
     font-size: 12px;

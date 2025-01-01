@@ -1,16 +1,24 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import *
 import json
-from .forms import PropertyForm
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from .models import *
 from django.views.decorators.http import require_http_methods
-from django.shortcuts import get_object_or_404
+from django.db.models import Max
+from chat.models import Chat
 
 def property_detail(request, id):
     property = get_object_or_404(Property, id=id)
-    return render(request, 'properties/property_detail.html', {'property': property})
 
+    if request.method == 'POST' and 'create_chat' in request.POST:
+        chat, created = Chat.objects.get_or_create(
+            property=property
+        )
+        chat.participants.add(request.user, property.owner)
+        return redirect('chat_detail', chat_id=chat.id)
+
+    return render(request, 'properties/property_detail.html', {'property': property})
 def about_us(request):
     return render(request, 'properties/about.html')
 
@@ -36,19 +44,14 @@ def add_property(request):
 def main_view(request):
     return render(request, 'properties/main.html') 
 
-def home(request):
-    query = request.GET.get('query', '') 
-    if query:
-        properties = Property.objects.filter(title__icontains=query)
-    else:
-        properties = Property.objects.all() 
-    return render(request, 'properties/home.html', {
-        'properties': properties,
-        'query': query,  
-    })
+def home_page(request):
+    max_price = Property.objects.all().aggregate(max_price=Max('price'))['max_price'] or 0
 
-@login_required
-def property_home(request):
+    price_min = request.GET.get('price_min', 0)
+    price_max = request.GET.get('price_max', max_price)
+    query = request.GET.get('query', '') 
+
+    properties = Property.objects.all()
     if request.method == 'POST':
         data = json.loads(request.body)
         property_id = data.get('property_id')
@@ -62,14 +65,35 @@ def property_home(request):
             status = 'added'
 
         return JsonResponse({'status': status})
+    if query: 
+        properties = properties.filter(title__icontains=query)
 
-    properties = Property.objects.all()
+    if price_min:
+        try:
+            price_min = float(price_min)
+            properties = properties.filter(price__gte=price_min)
+        except ValueError:
+            pass
+        
+    if price_max:
+        try:
+            price_max = float(price_max)
+            properties = properties.filter(price__lte=price_max)
+        except ValueError:
+            pass
+
     favorite_properties = request.user.favorites.values_list('id', flat=True)
 
     return render(request, 'properties/home_page.html', {
         'properties': properties,
-        'favorite_properties': favorite_properties
+        'favorite_properties': favorite_properties,
+        'query': query, 
+        'price_min': price_min,
+        'price_max': price_max,
+        'max_price': max_price,
     })
+
+
 
 @require_http_methods(["DELETE"])
 @login_required

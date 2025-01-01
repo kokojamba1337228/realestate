@@ -48,7 +48,7 @@
                         </div>
                     </a>
                     <div class="favorite-btn-wrapper">
-                            <i class="delete-favorite-btn fa-solid fa-heart-crack" onclick="deleteFavorite({{ property.id }})"></i> 
+                            <i class="delete-favorite-btn fa-solid fa-heart-crack" onclick="confirmDeleteFavorite({{ property.id }})"></i> 
                     </div>
                     <a href="{% url 'property_detail' property.id %}" class="property-link">
                         <h4 class="title">{{ property.title }}</h4>
@@ -104,6 +104,12 @@
             showSection(savedTab);
         });
 
+        function confirmDeleteFavorite(propertyId) {
+            if (confirm("Вы уверены, что хотите удалить это объявление из ибранных?")) {
+                deleteFavorite(propertyId);
+            }
+        }
+
         function deleteFavorite(propertyId) {
             fetch('{% url "delete_favorite" %}', {
                 method: 'POST',
@@ -118,6 +124,8 @@
                 if (data.status === 'removed') {
                     const propertyCard = document.querySelector(`.property-card[data-property-id="${propertyId}"]`);
                     propertyCard.remove();
+                    location.reload();
+
                 }
             });
         }
@@ -142,6 +150,7 @@
                 if (data.status === 'deleted') {
                     const propertyCard = document.querySelector(`.property-card[data-property-id="${propertyId}"]`);
                     propertyCard.remove();
+                    location.reload();
                 }
             });
         }

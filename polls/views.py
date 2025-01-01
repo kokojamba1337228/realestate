@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from properties.models import Property 
 import json
+from django.db import IntegrityError
 
 User = get_user_model()
 
@@ -43,29 +44,71 @@ def delete_favorite(request):
             return JsonResponse({'status': 'error', 'message': 'Property not found'})
         
         
+
 def user_register(request):
-    if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            
-            user.set_password(form.cleaned_data['password'])
-            
+    if request.method == "POST":
+        first_name = request.POST.get("first_name")
+        last_name = request.POST.get("last_name")
+        phone_number = request.POST.get("phone_number")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if password != confirm_password:
+            messages.error(request, "Пароли не совпадают")
+            return render(request, "polls/registration.html", {
+                "first_name": first_name,
+                "last_name": last_name,
+                "phone_number": phone_number,
+                "email": email,
+                "password": password,
+                "confirm_password": confirm_password,
+            })
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Электронная почта уже используется")
+            return render(request, "polls/registration.html", {
+                "first_name": first_name,
+                "last_name": last_name,
+                "phone_number": phone_number,
+                "email": email,
+                "password": password,
+                "confirm_password": confirm_password,
+            })
+        if User.objects.filter(phone_number=phone_number).exists():
+            messages.error(request, "Номер телефона уже используется")
+            return render(request, "polls/registration.html", {
+                "first_name": first_name,
+                "last_name": last_name,
+                "phone_number": phone_number,
+                "email": email,
+                "password": password,
+                "confirm_password": confirm_password,
+            })
+
+        try:
+            user = User.objects.create_user(
+                first_name=first_name,
+                last_name=last_name,
+                phone_number=phone_number,
+                email=email,
+                password=password,
+            )
             user.save()
-            
-            user = authenticate(email=form.cleaned_data['email'], password=form.cleaned_data['password'])
-            if user is not None:
-                login(request, user)
-                messages.success(request, f'Ваш аккаунт успешно создан!')
+            login(request, user)
+            return redirect("home_page")
+        except IntegrityError:
+            messages.error(request, "Ошибка при регистрации. Попробуйте снова.")
+            return render(request, "polls/registration.html", {
+                "first_name": first_name,
+                "last_name": last_name,
+                "phone_number": phone_number,
+                "email": email,
+                "password": password,
+                "confirm_password": confirm_password,
+            })
 
-                return redirect('home_page')
-            else:
-                messages.error(request, 'Не удалось зарегистрировать ваш аккаунт.')
-    else:
-        form = UserRegistrationForm()
-    
-    return render(request, 'polls/registration.html', {'form': form})
-
+    return render(request, "polls/registration.html")
 def user_login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -76,18 +119,21 @@ def user_login(request):
             user = EmailOrPhoneBackend().authenticate(request, identifier=identifier, password=password)
             
             if user is not None:
-                print(user.first_name)
                 login(request, user)
                 messages.success(request, f'Вы успешно вошли в аккаунт!')
-
-                return redirect('home_page')    
+                
+                storage = messages.get_messages(request)
+                for _ in storage:
+                    pass  
+                
+                return redirect('home_page')
             else:
-                form.add_error(None, 'Неверный телефон, email или пароль.')
+                messages.error(request, 'Неверный телефон, email или пароль.')
     else:
         form = LoginForm()
     
     return render(request, 'polls/login.html', {'form': form})
-
+    
 def user_logout(request):
     logout(request) 
     return redirect('login')

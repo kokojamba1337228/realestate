@@ -11,6 +11,24 @@ body{
     margin-bottom: 15px;
 }
 
+.start-chat{
+    padding: 10px 20px;
+    border-radius: 10px;
+    background-color: #e63946;
+    font-size: 18px;
+    color: white;
+    transition: all .20s;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+
+}
+
+.start-chat:hover {
+    background-color: #da2929; 
+    transition: all .20s linear;
+}
+
 p{
     margin-bottom: 10px;
 }
