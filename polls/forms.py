@@ -23,6 +23,7 @@ class UserRegistrationForm(forms.ModelForm):
             'email': 'Электронная почта', 
             'password': 'Пароль'
         }
+        
     def clean(self):
         cleaned_data = super().clean()
         password = cleaned_data.get('password')

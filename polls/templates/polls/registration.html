@@ -16,7 +16,6 @@
         <h2>Регистрация</h2>
         <form id="registrationForm" method="POST">
             {% csrf_token %}
-            
             <div class="form-group">
                 <i class="fas fa-user form-icon"></i>
                 <input type="text" id="id_first_name" name="first_name" required placeholder=" ">
@@ -48,7 +47,7 @@
                 <label for="id_confirm_password" class="label-placeholder">Подтверждение пароля</label>
             </div>
             <div>
-                Есть аккаунт?<a href="{% url 'login' %}"> Войти</a>
+                Есть аккаунт?<a class="login" href="{% url 'login' %}"> Войти</a>
             </div>  
             <button type="submit" id="submitBtn">Зарегистрироваться</button>
         </form>
@@ -78,7 +77,7 @@
             const phonePattern = /^(?:\+375)?(?:29|33|44|25|17)\d{7}$/;
             
             if (!phonePattern.test(phoneNumber)) {
-                this.setCustomValidity('Please enter a valid phone number (10-15 digits).');
+                this.setCustomValidity('Проверьте номер телефона');
             } else {
                 this.setCustomValidity(''); 
             }
@@ -88,7 +87,7 @@
             const email = this.value;
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
             if (!emailPattern.test(email)) {
-                this.setCustomValidity('Please enter a valid email address.');
+                this.setCustomValidity('Проверьте введенный email');
             } else {
                 this.setCustomValidity('');
             }

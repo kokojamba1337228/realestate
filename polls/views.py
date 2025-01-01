@@ -57,6 +57,7 @@ def user_register(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f'Ваш аккаунт успешно создан!')
+
                 return redirect('home_page')
             else:
                 messages.error(request, 'Не удалось зарегистрировать ваш аккаунт.')

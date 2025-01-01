@@ -9,23 +9,45 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'properties/scss/home.scss' %}">
-    <title>Список недвижимости</title>   
+    <title>Доступные объявления</title>   
 </head>
 <body>
     {% include 'properties/elements/header.html' %}
 
     <div class="container">
+        <!-- Search Bar -->
+        <form method="get" action="" class="search-form">
+            <input
+                type="text"
+                name="query"
+                class="search-input"
+                placeholder="Поиск недвижимости по названию..."
+                value="{{ query|default:'' }}"
+            >
+            <button type="submit" class="search-button">Найти</button>
+        </form>
+
         <h2 class>Доступная недвижимость</h2>
         <div class="property-list">
             {% for property in properties %}
                 <div class="property-card" data-property-id="{{ property.id }}">
+                    <a href="{% url 'property_detail' property.id %}" class="property-link">
+                        <div class="property-image-container">
+                            {% if property.images.all %}
+                                <img src="{{ property.images.first.image.url }}" alt="Property Image" class="property-image">
+                            {% else %}
+                                <img src="{% static 'properties/images/default.jpg' %}" alt="No Image Available" class="property-image">
+                            {% endif %}
+                        </div>
+                    </a>
+
                     <div class="favorite-btn-wrapper">
                         {% csrf_token %}
                         <i class="favorite-btn fa-heart {% if property.id in favorite_properties %}fas{% else %}far{% endif %}" onclick="removeFavorite({{ property.id }})"></i>
                     </div>
                     <a href="{% url 'property_detail' property.id %}" class="property-link">
                         <p class="title">{{ property.title }}</p>
-                        <p><strong>Цена:</strong> {{ property.price }} BYN</p>
+                        <p class="price"><strong>Цена:</strong> {{ property.price }} BYN</p>
                         <p><strong>Адрес:</strong> {{ property.location }}</p>
                         <p><strong>Площадь:</strong> {{ property.size }} м²</p>
                         <p>{{ property.description }}</p>
@@ -38,6 +60,7 @@
     </div>
 
     <script>
+        
         function removeFavorite(propertyId) {
             const heartIcon = document.querySelector(`.property-card[data-property-id="${propertyId}"] .favorite-btn`);
             fetch(window.location.href, { 
@@ -60,5 +83,7 @@
             });
         }
     </script>
+    {% include 'properties/elements/footer.html' %}
+
 </body>
 </html>

@@ -3,7 +3,7 @@ import json
 from .forms import PropertyForm
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from .models import Property
+from .models import *
 from django.views.decorators.http import require_http_methods
 from django.shortcuts import get_object_or_404
 
@@ -11,19 +11,41 @@ def property_detail(request, id):
     property = get_object_or_404(Property, id=id)
     return render(request, 'properties/property_detail.html', {'property': property})
 
+def about_us(request):
+    return render(request, 'properties/about.html')
+
 @login_required
 def add_property(request):
     if request.method == 'POST':
         form = PropertyForm(request.POST)
         if form.is_valid():
-            property = form.save(commit=False)
-            property.owner = request.user
-            property.save()
-            return redirect('home_page')
+            property_instance = form.save(commit=False)
+            property_instance.owner = request.user 
+            property_instance.save()
+
+            images = request.FILES.getlist('images')
+            for image in images:
+                PropertyImage.objects.create(property=property_instance, image=image)
+
+            return redirect('property_detail', id=property_instance.id)
     else:
         form = PropertyForm()
 
     return render(request, 'properties/add_property.html', {'form': form})
+
+def main_view(request):
+    return render(request, 'properties/main.html') 
+
+def home(request):
+    query = request.GET.get('query', '') 
+    if query:
+        properties = Property.objects.filter(title__icontains=query)
+    else:
+        properties = Property.objects.all() 
+    return render(request, 'properties/home.html', {
+        'properties': properties,
+        'query': query,  
+    })
 
 @login_required
 def property_home(request):

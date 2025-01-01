@@ -4,5 +4,7 @@ from .views import *
 urlpatterns = [
     path('home/', property_home, name='home_page'),
     path('add/', add_property, name='add_property'),
+    path("about/", about_us, name="about_us"),
     path('detail/<int:id>/', property_detail, name='property_detail'),
-    path('remove-favorite/<int:property_id>/', remove_favorite, name='remove_favorite'),] 
+    path('remove-favorite/<int:property_id>/', remove_favorite, name='remove_favorite'),
+] 

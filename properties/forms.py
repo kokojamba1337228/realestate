@@ -1,5 +1,5 @@
 from django import forms
-from .models import Property
+from .models import Property, PropertyImage
 
 class PropertyForm(forms.ModelForm):
     class Meta:

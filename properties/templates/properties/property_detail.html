@@ -15,11 +15,26 @@
 
 {% block content %}
     <div class="container">
-        <h2>{{ property.title }}</h2>
-        <p><strong>Описание:</strong> {{ property.description }}</p>
+        <h2 class="title">{{ property.title }}</h2>
+
+        <div class="property-image-container">
+            {% if property.images.all %}
+                <img src="{{ property.images.first.image.url }}" alt="Property Image" class="property-image">
+            {% else %}
+                <img src="{% static 'properties/images/default.jpg' %}" alt="No Image Available" class="property-image">
+            {% endif %}
+        </div>
         <p><strong>Цена:</strong> ${{ property.price }}</p>
         <p><strong>Адрес:</strong> {{ property.location }}</p>
         <p><strong>Площадь:</strong> {{ property.size }} м²</p>
+        {% csrf_token %}
+        <p><strong>Номер продавца:</strong> {{ property.owner.phone_number }}</p>
+        <p><strong>Email продавца:</strong> {{ property.owner.email }}</p>
+        <p><strong class="description">Описание:</strong> {{ property.description }}</p>
+
+
     </div>
 {% endblock %}
+{% include 'properties/elements/footer.html' %}
+
 </body>

@@ -1,25 +1,25 @@
 body {
     margin: 0;
-    font-family: "Montserrat", sans-serif;
+    font-family: 'Montserrat', sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between  ;
 }
 
-.container {
-    max-width: 1000px;
-}
-
 .header {
     display: flex;
     align-items: center;
+    position: fixed;
     justify-content: space-between;
     padding: 10px 20px;
     width: 75%;
     top: 0;
-    margin: 0 200px;
+    z-index: 1000;
+    background-color: #f1f1f1;
+
 }
+
 
 * {
     margin: 0;
@@ -37,7 +37,7 @@ body {
 
 .logo i {
     margin-right: 8px; 
-    color: #ff2e2e; 
+    color: #e63946;
 }
 
 .logo a {
@@ -62,6 +62,7 @@ body {
     transition: all .20s;
     border-radius: 10px;
     padding: 10px ;
+    
 }
 
 .nav ul li:hover {
@@ -91,11 +92,13 @@ body {
 
 .log-out{
     transition: all .20s;
-    color: #3d3d3d
+    color: #3d3d3d;
+    background-color: #e2e2e2;
+
 }
 
 .log-out:hover{
-    background-color: #e7e7e7; 
+    background-color: #c9c9c9; 
     transition: all .20s linear;
 }
 
@@ -107,7 +110,7 @@ body {
 .join {
     transition: all .20s;
     color: #ffffff;
-    background-color: #ff2e2e; 
+    background-color: #e63946;
 }
 
 .join:hover {

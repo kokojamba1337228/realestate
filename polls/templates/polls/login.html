@@ -10,12 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <style>
-        .error-message {
-            color: red;
-            display: none;
-        }
-    </style>
+
 </head>
 <body>
 
@@ -33,7 +28,6 @@
                 <input type="password" id="id_password" name="login_password" required placeholder=" ">
                 <label for="id_password" class="label-placeholder">Пароль</label>
             </div>
-            <small class="error-message" id="error-message">Введите email или номер телефона</small>
             <div>
                 Еще нет аккаунт?<a href="{% url 'register' %}"> Создать</a>
             </div>  
@@ -44,7 +38,6 @@
     <script>
         document.getElementById('loginForm').addEventListener('submit', function(event) {
             const identifier = document.getElementById('identifier').value;
-            const errorMessage = document.getElementById('error-message');
             const phonePattern = /^(?:\+375)?(?:29|33|44|25|17)\d{7}$/;     
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;  
 
