@@ -35,7 +35,7 @@
                         <div class="filter-item">
                             <label for="price-min">Цена от:</label>
                             <input type="range" name="price_min" id="price-min" class="filter-input" min="0" max="{{ max_price }}" value="{{ price_min|default:0 }}" step="1" oninput="updatePriceDisplay()">
-                            <span id="price-min-display">{{ price_min|default:"0" }}</span> BYN -                        </div>
+                            <span id="price-min-display">{{ price_min|default:"0" }}</span> BYN                        </div>
                         <div class="filter-item">
                             <label for="price-max">Цена до:</label>
                             <input type="range" name="price_max" id="price-max" class="filter-input" min="0" max="{{ max_price }}" value="{{ price_max|default:max_price }}" step="1" oninput="updatePriceDisplay()">
@@ -43,10 +43,12 @@
                         </div>
                         <div class="filter-item">
                             <label for="sorting">Сортировать по:</label>
-                            <select name="sorting" id="sorting" class="filter-input">
-                                <option value="price_asc" {% if sorting == 'price_asc' %}selected{% endif %}>Цена: от низкой к высокой</option>
-                                <option value="price_desc" {% if sorting == 'price_desc' %}selected{% endif %}>Цена: от высокой к низкой</option>
-                            </select>
+                            <form method="GET" action="{% url 'home_page' %}">
+                                <select name="order_by" onchange="this.form.submit()">
+                                    <option value="">По умолчанию</option>
+                                    <option value="price_asc" {% if order_by == 'price_asc' %}selected{% endif %}>По возрастанию</option>
+                                    <option value="price_desc" {% if order_by == 'price_desc' %}selected{% endif %}>По убыванию</option>
+                                </select>
                         </div>
                         <button type="submit" class="filter-submit">Применить фильтры</button>
                     </form>
@@ -67,7 +69,6 @@
                             {% endif %}
                         </div>
                     </a>
-
                     <div class="favorite-btn-wrapper">
                         {% csrf_token %}
                         <i class="favorite-btn fa-heart {% if property.id in favorite_properties %}fas{% else %}far{% endif %}" onclick="removeFavorite({{ property.id }})"></i>
@@ -110,7 +111,7 @@
 
         function removeFavorite(propertyId) {
             const heartIcon = document.querySelector(`.property-card[data-property-id="${propertyId}"] .favorite-btn`);
-            fetch(window.location.href, { 
+            fetch(window.location.href, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -118,8 +119,14 @@
                 },
                 body: JSON.stringify({ property_id: propertyId })
             })
-            .then(response => response.json())
-            .then(data => {
+            .then(response => {
+                if (response.status === 403) {
+                    window.location.href = "{% url 'login' %}?next=" + encodeURIComponent(window.location.pathname) + "&unauth_favorite=true";
+                    return Promise.reject('Authentication required');
+                }
+                return response.json();
+            })
+            .then(data => { 
                 if (data.status === 'added') {
                     heartIcon.classList.remove('far');
                     heartIcon.classList.add('fas');
@@ -127,8 +134,14 @@
                     heartIcon.classList.remove('fas');
                     heartIcon.classList.add('far');
                 }
+            })
+            .catch(error => {
+                if (error !== 'Authentication required') {
+                    console.error('An error occurred:', error);
+                }
             });
         }
+             
     </script>
 
     {% include 'properties/elements/footer.html' %}

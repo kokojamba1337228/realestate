@@ -23,11 +23,29 @@
         <nav class="nav">
             <ul>
                 <li><a href="{% url 'home_page' %}">Купить</a></li>
-                <li><a href="{% url 'add_property' %}">Продать</a></li>
-                <li><a href="{% url 'home_page'%}">Новые предложения</a></li>
-                <li><a href="{% url 'profile' %}">Аккаунт</a></li>
-                <li><a href="{% url 'chat_list' %}">Чаты</a></li>
-
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'add_property' %}">Продать</a></li>
+                    <li><a href="{% url 'home_page'%}">Новые предложения</a></li>
+                    <li><a href="{% url 'profile' %}">Аккаунт</a></li>
+                    <li><a href="{% url 'chat_list' %}">Чаты</a></li>
+                {% else %}
+                    <li>
+                        <a href="{% url 'login' %}?next={% url 'add_property' %}&unauth_add_property=true">
+                            Продать
+                        </a>
+                    </li>
+                    <li><a href="{% url 'home_page'%}">Новые предложения</a></li>
+                    <li>
+                        <a href="{% url 'login' %}?next={% url 'profile' %}&unauth_account=true">
+                            Аккаунт
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'login' %}?next={% url 'chat_list' %}&unauth_chat=true">
+                            Чаты
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
         </nav>
         <div class="auth-buttons">
@@ -40,6 +58,8 @@
             {% endif %}
         </div>
     </header>
+    
+    
 
     <div class="content">
         {% block content %}

@@ -36,9 +36,7 @@
         <div class="chat-actions">
             <form action="{% url 'delete_chat' chat_item.chat.id %}" method="post" class="delete-form">
                 {% csrf_token %}
-                <button type="submit" class="delete-button">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <i class="fas fa-trash delete-button" onclick="confirmDelete(event, this.closest('form'))"></i>
             </form>
         </div>
     </div>
@@ -46,8 +44,14 @@
     <p>Нет доступных чатов.</p>
     {% endfor %}
 </div>
-
-
+<script>
+    function confirmDelete(event, form) {
+        event.preventDefault();  
+        if (confirm('Вы уверены, что хотите удалить этот чат?')) {
+            form.submit(); 
+        }
+    }
+</script>
 {% include 'properties/elements/footer.html' %}
 </body>
 </html>

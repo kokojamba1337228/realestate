@@ -24,6 +24,26 @@ body{
 
 }
 
+.warning-message {
+
+    position: fixed;
+    top: -100px; 
+    padding: 25px 40px;
+    background-color: rgba(201, 80, 80, 0.712);
+    color: white;
+    text-align: center;
+    align-items: center;
+    font-size: 18px;
+    border-radius: 10px;
+    font-weight: bold;
+    z-index: 1000;
+    transition: top 1s ease-in-out; 
+}
+
+.show-warning {
+    top: 50px;
+}
+
 .start-chat:hover {
     background-color: #da2929; 
     transition: all .20s linear;

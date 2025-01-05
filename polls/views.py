@@ -109,34 +109,43 @@ def user_register(request):
             })
 
     return render(request, "polls/registration.html")
+
 def user_login(request):
+    unauth_add_property = request.GET.get('unauth_add_property', 'false') == 'true'
+    unauth_account = request.GET.get('unauth_account', 'false') == 'true'
+    unauth_chat = request.GET.get('unauth_chat', 'false') == 'true'
+    unauth_favorite = request.GET.get('unauth_favorite', 'false') == 'true'
+
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
             identifier = form.cleaned_data['identifier']
             password = form.cleaned_data['login_password']
-            
+
             user = EmailOrPhoneBackend().authenticate(request, identifier=identifier, password=password)
-            
+
             if user is not None:
                 login(request, user)
-                messages.success(request, f'Вы успешно вошли в аккаунт!')
-                
-                storage = messages.get_messages(request)
-                for _ in storage:
-                    pass  
-                
-                return redirect('home_page')
+                messages.success(request, 'Вы успешно вошли в аккаунт!')
+                return redirect(request.GET.get('next', 'home_page'))
             else:
                 messages.error(request, 'Неверный телефон, email или пароль.')
     else:
         form = LoginForm()
-    
+        if unauth_add_property:
+            messages.warning(request, 'Пожалуйста, войдите в аккаунт, чтобы добавить объявление.')
+        if unauth_account:
+            messages.warning(request, 'Пожалуйста, войдите в аккаунт, чтобы просмотреть профиль.')
+        if unauth_chat:
+            messages.warning(request, 'Пожалуйста, войдите в аккаунт, чтобы использовать чаты.')
+        if unauth_favorite:
+            messages.warning(request, 'Пожалуйста, войдите в аккаунт, чтобы добавить в избранное.')
+
     return render(request, 'polls/login.html', {'form': form})
-    
+
 def user_logout(request):
     logout(request) 
-    return redirect('login')
+    return redirect('main')
 
 @login_required
 def profile_view(request):

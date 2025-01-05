@@ -3,14 +3,15 @@ from django.http import HttpResponse, HttpResponseNotAllowed
 from .models import Chat, Message
 from properties.models import Property
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 @login_required
 def chat_list(request):
-    chats = Chat.objects.filter(participants=request.user)
+    chats = Chat.objects.filter(Q(buyer=request.user) | Q(seller=request.user))
     chat_data = []
 
     for chat in chats:
-        other_user = chat.participants.exclude(id=request.user.id).first()
+        other_user = chat.buyer if request.user == chat.seller else chat.seller
         last_message = chat.messages.last()
         chat_data.append({
             'chat': chat,
@@ -21,39 +22,48 @@ def chat_list(request):
         })
 
     return render(request, 'chat/chat_list.html', {'chats': chat_data})
-
 @login_required
 def chat_detail(request, chat_id):
     chat = get_object_or_404(Chat, id=chat_id)
-    other = chat.participants.exclude(id=request.user.id).first()
 
-    if request.user not in chat.participants.all():
-        return HttpResponse("You are not a participant in this chat.", status=403)
-    
+    if request.user != chat.buyer and request.user != chat.seller:
+        return HttpResponse("You are not authorized to access this chat.", status=403)
+
     messages = chat.messages.all()
-    
+    other_user = chat.buyer if request.user == chat.seller else chat.seller
+
     if request.method == 'POST':
         message_content = request.POST.get('message')
         if message_content:
             Message.objects.create(chat=chat, sender=request.user, content=message_content)
             return redirect('chat_detail', chat_id=chat.id)
-    
-    return render(request, 'chat/chat_detail.html', {'chat': chat, 'messages': messages, 'other': other})
+
+    return render(request, 'chat/chat_detail.html', {
+        'chat': chat,
+        'messages': messages,
+        'other_user': other_user
+    })
 
 @login_required
 def create_chat(request, property_id):
     property = get_object_or_404(Property, id=property_id)
-    
-    chat = Chat.objects.create(property=property)
-    chat.participants.add(request.user, property.owner)
-    
+
+    if request.user == property.owner:
+        return HttpResponse("You cannot start a chat with yourself.", status=403)
+
+    existing_chat = Chat.objects.filter(buyer=request.user, seller=property.owner, property=property).first()
+
+    if existing_chat:
+        return redirect('chat_detail', chat_id=existing_chat.id)
+
+    chat = Chat.objects.create(buyer=request.user, seller=property.owner, property=property)
+
     return redirect('chat_detail', chat_id=chat.id)
 
 @login_required
 def delete_chat(request, chat_id):
     if request.method == "POST":
         chat = get_object_or_404(Chat, id=chat_id)
-        if chat.participants.filter(id=request.user.id).exists():
-            chat.delete()
+        chat.delete()
         return redirect('chat_list')
     return HttpResponseNotAllowed(['POST'])

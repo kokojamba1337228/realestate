@@ -1,5 +1,7 @@
 {% load static %}
 {% load bootstrap5 %}
+<html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +15,6 @@
 <body>
 {% include 'properties/elements/header.html' %}
 
-{% block content %}
     <div class="container">
         <h2 class="title">{{ property.title }}</h2>
 
@@ -27,19 +28,42 @@
         <p><strong>Цена:</strong> ${{ property.price }}</p>
         <p><strong>Адрес:</strong> {{ property.location }}</p>
         <p><strong>Площадь:</strong> {{ property.size }} м²</p>
-        {% csrf_token %}
         <p><strong>Номер продавца:</strong> {{ property.owner.phone_number }}</p>
         <p><strong>Email продавца:</strong> {{ property.owner.email }}</p>
         <p><strong class="description">Описание:</strong> {{ property.description }}</p>
-        <form method="POST">
+        
+        {% if user.is_authenticated %}
+        <form method="POST" id="chat-form">
             {% csrf_token %}
             <button type="submit" name="create_chat" class="btn btn-primary mt-3 start-chat">
                 Начать чат с продавцом
             </button>
         </form>
-
+        {% else %}
+        <p>Для начала чата необходимо войти в аккаунт.</p>
+        {% endif %}
     </div>
-{% endblock %}
+
+    <div id="warning-message" class="warning-message">
+        Вы не можете начать чат с собой!
+    </div>
+
 {% include 'properties/elements/footer.html' %}
 
+<script>
+    document.getElementById("chat-form").addEventListener("submit", function(event) {
+        {% if user == property.owner %}
+        event.preventDefault();
+
+        var warningMessage = document.getElementById("warning-message");
+        warningMessage.classList.add("show-warning");
+
+        setTimeout(function() {
+            warningMessage.classList.remove("show-warning");
+        }, 5000);
+        {% endif %}
+    });
+</script>
+
 </body>
+</html>
