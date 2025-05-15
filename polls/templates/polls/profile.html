@@ -79,6 +79,7 @@
                     </a>
                     <div class="delete-btn-wrapper">
                             <i class="delete-property-btn fa-solid fa-trash" onclick="confirmDeleteProperty({{ property.id }})"></i>
+                            <i class="delete-property-btn fa-solid fa-pencil-alt" onclick="redirectToUpdatePage({{ property.id }})"></i>
                     </div>
                     <a href="{% url 'property_detail' property.id %}" class="property-link">
                         <p class="title">{{ property.title }}</p>
@@ -153,6 +154,10 @@
                     location.reload();
                 }
             });
+        }
+
+        function redirectToUpdatePage(propertyId) {
+            window.location.href = `/properties/update/${propertyId}/`;
         }
 
         function showSection(section) {

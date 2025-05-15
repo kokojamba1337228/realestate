@@ -28,7 +28,7 @@
             {% endfor %}
         </div>
 
-        <form method="POST">
+        <form method="POST" action="{% url 'chat_detail' chat.id %}">
             {% csrf_token %}
             <div class="send-container">
             <textarea name="message" placeholder="Напишите сообщение..." required></textarea>
@@ -41,18 +41,53 @@
         document.addEventListener("DOMContentLoaded", () => {
             const textarea = document.querySelector("textarea[name='message']");
             const form = document.querySelector("form");
-    
+            const messagesContainer = document.querySelector(".messages");
+        
+            form.addEventListener("submit", (event) => {
+                event.preventDefault();
+                submitForm();
+            });
+        
             textarea.addEventListener("keydown", (event) => {
                 if (event.key === "Enter") {
                     if (event.shiftKey) {
-                        return;
+                        return; 
                     } else {
                         event.preventDefault();
-                        form.submit();
+                        submitForm();
                     }
                 }
             });
+        
+            const submitForm = () => {
+                const formData = new FormData(form);
+        
+                fetch(form.action, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        const newMessage = document.createElement("div");
+                        newMessage.classList.add("message", "sent");
+                        newMessage.innerHTML = `
+                            <p><strong>${data.sender}:</strong> ${data.content}</p>
+                            <p><small>${data.created_at}</small></p>
+                        `;
+                        messagesContainer.appendChild(newMessage);
+                        textarea.value = ""; 
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight; 
+                    })
+                    .catch((error) => {
+                        console.error("Error sending message:", error);
+                    });
+            };
         });
+        
+        
     </script>
     
 </body>

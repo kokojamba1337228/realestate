@@ -47,8 +47,7 @@ h2 {
 .filter-menu {
     display: none;
     position: absolute;
-    top: 7%;
-    right: 5%;
+    top: 100px;
     background-color: #fff;
     padding: 20px;
     border: 1px solid #ddd;
@@ -199,6 +198,7 @@ a {
 }
 
 input[type="range"] {
+    padding: 0px;
     -webkit-appearance: none;
     appearance: none;
     width: 100%;

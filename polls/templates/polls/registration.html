@@ -65,76 +65,71 @@
         </form>
         
     </div>
-
+    <script src="https://unpkg.com/imask"></script>
     <script>
-        document.getElementById('showPasswordIcon').addEventListener('click', function() {
+        function validatePasswordMatch() {
             const passwordField = document.getElementById('id_password');
-            const icon = this;
-        
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                icon.classList.add('active');
-            } else {
-                passwordField.type = 'password';
-                icon.classList.remove('active');
-            }
-        });
-        
-        document.getElementById('showConfirmPasswordIcon').addEventListener('click', function() {
             const confirmPasswordField = document.getElementById('id_confirm_password');
-            const icon = this;
+            if (confirmPasswordField.value !== passwordField.value) {
+                confirmPasswordField.setCustomValidity('Пароли не совпадают');
+            } else {
+                confirmPasswordField.setCustomValidity('');
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const element = document.getElementById('id_phone_number');
+            if (element) {
+                IMask(element, { mask: '+{375}(00)000-00-00' });
+            }
         
-            if (confirmPasswordField.type === 'password') {
-                confirmPasswordField.type = 'text';
-                icon.classList.add('active');
-            } else {
-                confirmPasswordField.type = 'password';
-                icon.classList.remove('active');
+            const emailField = document.getElementById('id_email');
+            if (emailField) {
+                emailField.addEventListener('input', function () {
+                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailPattern.test(this.value)) {
+                        this.setCustomValidity('Проверьте введенный email');
+                    } else {
+                        this.setCustomValidity('');
+                    }
+                });
+            }
+        
+            const passwordField = document.getElementById('id_password');
+            const confirmPasswordField = document.getElementById('id_confirm_password');
+            if (passwordField && confirmPasswordField) {
+                passwordField.addEventListener('input', validatePasswordMatch);
+                confirmPasswordField.addEventListener('input', validatePasswordMatch);
+            }
+        
+            const showPasswordIcon = document.getElementById('showPasswordIcon');
+            if (showPasswordIcon) {
+                showPasswordIcon.addEventListener('click', function () {
+                    const passwordField = document.getElementById('id_password');
+                    if (passwordField.type === 'password') {
+                        passwordField.type = 'text';
+                        this.classList.add('active');
+                    } else {
+                        passwordField.type = 'password';
+                        this.classList.remove('active');
+                    }
+                });
+            }
+        
+            const showConfirmPasswordIcon = document.getElementById('showConfirmPasswordIcon');
+            if (showConfirmPasswordIcon) {
+                showConfirmPasswordIcon.addEventListener('click', function () {
+                    const confirmPasswordField = document.getElementById('id_confirm_password');
+                    if (confirmPasswordField.type === 'password') {
+                        confirmPasswordField.type = 'text';
+                        this.classList.add('active');
+                    } else {
+                        confirmPasswordField.type = 'password';
+                        this.classList.remove('active');
+                    }
+                });
             }
         });
-        document.getElementById('id_password').addEventListener('input', validatePasswordMatch);
-        document.getElementById('id_confirm_password').addEventListener('input', validatePasswordMatch);
-
-        const phoneInput = document.getElementById('id_phone_number');
-        phoneInput.addEventListener('input', function(event) {
-            const input = this.value.replace(/\D/g, ''); 
-            const defaultPrefix = '+375';
-
-            if (!input.startsWith('375')) {
-                this.value = defaultPrefix;
-                return;
-            }
-
-            this.value = defaultPrefix + input.substring(3, 12);
-        });
-
-        phoneInput.addEventListener('focus', function() {
-            if (this.value === '') {
-                this.value = '+375'; 
-            }
-        });
-
-        phoneInput.addEventListener('blur', function() {
-            if (this.value === '+375') {
-                this.value = ''; 
-            }
-        });
-
-        document.getElementById('id_email').addEventListener('input', function() {
-            const email = this.value;
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(email)) {
-                this.setCustomValidity('Проверьте введенный email');
-            } else {
-                this.setCustomValidity('');
-            }
-        });
-
-        document.getElementById('registrationForm').addEventListener('submit', function(event) {
-            if (document.getElementById('id_confirm_password').validationMessage) {
-                event.preventDefault();
-            }
-        });
+        
     </script>
 </body>
 </html>

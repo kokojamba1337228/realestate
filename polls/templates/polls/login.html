@@ -36,6 +36,9 @@
             <div>
                 Еще нет аккаунта? <a href="{% url 'register' %}">Создать</a>
             </div>  
+            <div>
+                Забыли пароль? <a href="{% url 'password_reset_request' %}">Восстановить</a>
+            </div>
             <button type="submit" id="submitBtn">Войти</button>
         </form>
     </div>
@@ -55,4 +58,3 @@
     </script>
 </body>
 </html>
-

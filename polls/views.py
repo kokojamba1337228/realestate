@@ -11,8 +11,93 @@ from django.views.decorators.csrf import csrf_exempt
 from properties.models import Property 
 import json
 from django.db import IntegrityError
+from .models import *
+from django.core.mail import send_mail
+import random
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.timezone import now
+from django.conf import settings
+from django.contrib.auth.hashers import make_password
 
 User = get_user_model()
+
+token_generator = PasswordResetTokenGenerator()
+
+
+def send_2fa_email(user):
+    code = str(random.randint(100000, 999999))
+    TwoFactorAuth.objects.update_or_create(user=user, defaults={"code": code, "created_at": now()})
+    send_mail(
+        'Your 2FA Code',
+        f'Your verification code is {code}',
+        'no-reply@example.com',
+        [user.email],
+    )
+
+@login_required
+def initiate_2fa(request):
+    send_2fa_email(request.user)
+    return render(request, "polls/2fa_verification.html")
+
+
+def password_reset_code_view(request):
+    if request.method == "POST":
+        reset_code = request.POST.get("reset_code")
+        new_password = request.POST.get("new_password")
+
+        try:
+            two_factor_auth = TwoFactorAuth.objects.get(code=reset_code)
+            
+            if two_factor_auth.is_expired():
+                return render(request, "polls/password_reset_code.html", {"error": "Код истёк. Пожалуйста, запросите новый."})
+
+            user = two_factor_auth.user
+            user.password = make_password(new_password)
+            user.save()
+
+            two_factor_auth.delete()
+
+            return redirect("login")
+        except TwoFactorAuth.DoesNotExist:
+            return render(request, "polls/password_reset_code.html", {"error": "Неверный код."})
+    return render(request, "polls/password_reset_code.html")
+
+def password_reset_request_view(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        try:
+            user = CustomUser.objects.get(email=email)
+            reset_code = str(random.randint(100000, 999999))
+            
+            TwoFactorAuth.objects.update_or_create(
+                user=user,
+                defaults={"code": reset_code, "created_at": timezone.now()},
+            )
+
+            send_mail(
+                'Код для восстановления пароля',
+                f'Ваш код для восстановления пароля: {reset_code}',
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+            )
+            return render(request, "polls/password_reset_request.html", {"success": "Код отправлен на вашу почту."})
+        except CustomUser.DoesNotExist:
+            return render(request, "polls/password_reset_request.html", {"error": "Пользователь с таким Email не найден."})
+    return render(request, "polls/password_reset_request.html")
+
+@login_required
+def verify_2fa(request):
+    if request.method == "POST":
+        code = request.POST.get("code")
+        try:
+            auth = TwoFactorAuth.objects.get(user=request.user, code=code)
+            if not auth.is_expired():
+                return redirect("profile") 
+            else:
+                return render(request, "polls/2fa_verification.html", {"error": "Code expired"})
+        except TwoFactorAuth.DoesNotExist:
+            return render(request, "polls/2fa_verification.html", {"error": "Invalid code"})
+    return render(request, "polls/2fa_verification.html")
 
 @login_required
 @csrf_exempt

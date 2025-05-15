@@ -8,26 +8,23 @@ from django.views.decorators.http import require_http_methods
 from django.db.models import Max
 from chat.models import Chat
 from django.contrib import messages
+from django.http import Http404
 
 def property_detail(request, id):
     property = Property.objects.get(id=id)
-    
-    if request.method == 'POST' and 'create_chat' in request.POST:
+    if request.method == 'POST' and 'create_chat' not in request.POST:
         if property.owner == request.user:
             messages.warning(request, 'Вы не можете начать чат с самим собой.')
             return redirect('property_detail', id=property.id)
-
-        if property.owner != request.user:
-            buyer = request.user
-            seller = property.owner
-
-            chat, created = Chat.objects.get_or_create(
-                property=property,
-                buyer=buyer,
-                seller=seller
-            )
-
-            return redirect('chat_detail', chat_id=chat.id)
+    if request.method == 'POST' and 'create_chat' in request.POST:
+        buyer = request.user
+        seller = property.owner
+        chat, created = Chat.objects.get_or_create(
+            property=property,
+            buyer=buyer,
+            seller=seller
+        )
+        return redirect('chat_detail', chat_id=chat.id)
 
     return render(request, 'properties/property_detail.html', {'property': property})
 
@@ -35,12 +32,34 @@ def about_us(request):
     return render(request, 'properties/about.html')
 
 @login_required
+def update_property(request, property_id):
+    property_instance = get_object_or_404(Property, id=property_id)
+    
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        price = request.POST.get('price')
+        location = request.POST.get('location')
+        size = request.POST.get('size')
+        
+        property_instance.title = title
+        property_instance.description = description
+        property_instance.price = price
+        property_instance.location = location
+        property_instance.size = size
+        
+        property_instance.save()
+
+        return redirect('property_detail', id=property_instance.id)
+    
+    return render(request, 'properties/update_property.html', {'property': property_instance})
+@login_required
 def add_property(request):
     if request.method == 'POST':
-        form = PropertyForm(request.POST)
+        form = PropertyForm(request.POST, request.FILES)
         if form.is_valid():
             property_instance = form.save(commit=False)
-            property_instance.owner = request.user 
+            property_instance.owner = request.user
             property_instance.save()
 
             images = request.FILES.getlist('images')
@@ -57,7 +76,7 @@ def main_view(request):
     return render(request, 'properties/main.html') 
 
 def home_page(request):
-    max_price = Property.objects.all().aggregate(max_price=Max('price'))['max_price'] or 0
+    max_price = Property.objects.aggregate(max_price=Max('price'))['max_price'] or 0
 
     price_min = request.GET.get('price_min', 0)
     price_max = request.GET.get('price_max', max_price)

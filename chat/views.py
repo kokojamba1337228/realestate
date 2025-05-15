@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, HttpResponseNotAllowed
+from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse
 from .models import Chat, Message
 from properties.models import Property
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+
 
 @login_required
 def chat_list(request):
@@ -22,6 +23,8 @@ def chat_list(request):
         })
 
     return render(request, 'chat/chat_list.html', {'chats': chat_data})
+
+
 @login_required
 def chat_detail(request, chat_id):
     chat = get_object_or_404(Chat, id=chat_id)
@@ -35,14 +38,20 @@ def chat_detail(request, chat_id):
     if request.method == 'POST':
         message_content = request.POST.get('message')
         if message_content:
-            Message.objects.create(chat=chat, sender=request.user, content=message_content)
-            return redirect('chat_detail', chat_id=chat.id)
+            message = Message.objects.create(chat=chat, sender=request.user, content=message_content)
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'sender': message.sender.first_name,
+                    'content': message.content,
+                    'created_at': message.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                })
 
     return render(request, 'chat/chat_detail.html', {
         'chat': chat,
         'messages': messages,
         'other_user': other_user
     })
+
 
 @login_required
 def create_chat(request, property_id):

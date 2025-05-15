@@ -2,6 +2,12 @@ from django.db import models
 from django.utils import timezone
 from django.db.models.signals import post_save
 
+class Tag(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+    
 class Property(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(null=True)
@@ -20,3 +26,4 @@ class PropertyImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.property.title}"
+

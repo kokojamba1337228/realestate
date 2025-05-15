@@ -35,23 +35,25 @@
                         <div class="filter-item">
                             <label for="price-min">Цена от:</label>
                             <input type="range" name="price_min" id="price-min" class="filter-input" min="0" max="{{ max_price }}" value="{{ price_min|default:0 }}" step="1" oninput="updatePriceDisplay()">
-                            <span id="price-min-display">{{ price_min|default:"0" }}</span> BYN                        </div>
+                            <span id="price-min-display">{{ price_min }}</span> BYN
+                        </div>
                         <div class="filter-item">
                             <label for="price-max">Цена до:</label>
                             <input type="range" name="price_max" id="price-max" class="filter-input" min="0" max="{{ max_price }}" value="{{ price_max|default:max_price }}" step="1" oninput="updatePriceDisplay()">
-                            <span id="price-max-display">{{ price_max|default:max_price }}</span> BYN
+                            <span id="price-max-display">{{ price_max }}</span> BYN
                         </div>
                         <div class="filter-item">
                             <label for="sorting">Сортировать по:</label>
-                            <form method="GET" action="{% url 'home_page' %}">
-                                <select name="order_by" onchange="this.form.submit()">
-                                    <option value="">По умолчанию</option>
-                                    <option value="price_asc" {% if order_by == 'price_asc' %}selected{% endif %}>По возрастанию</option>
-                                    <option value="price_desc" {% if order_by == 'price_desc' %}selected{% endif %}>По убыванию</option>
-                                </select>
+                            <select name="order_by">
+                                <option value="" {% if order_by == '' %}selected{% endif %}>По умолчанию</option>
+                                <option value="price_asc" {% if order_by == 'price_asc' %}selected{% endif %}>По возрастанию</option>
+                                <option value="price_desc" {% if order_by == 'price_desc' %}selected{% endif %}>По убыванию</option>
+                            </select>
                         </div>
+                        <input type="hidden" name="query" value="{{ query }}">
                         <button type="submit" class="filter-submit">Применить фильтры</button>
                     </form>
+                    
                 </div>
             </div>
         </div>
