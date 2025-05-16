@@ -12,14 +12,34 @@ body {
     align-items: center;
     position: fixed;
     justify-content: space-between;
-    padding: 10px 20px;
-    width: 75%;
+    padding: 10px 40px;
+    width: 80%;
     top: 0;
     z-index: 1000;
     background-color: #f1f1f1;
-
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
+.header::before,
+.header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 40px;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.header::before {
+  left: 0;
+  background: linear-gradient(to right, #f1f1f1 0%, transparent 100%);
+}
+
+.header::after {
+  right: 0;
+  background: linear-gradient(to left, #f1f1f1 0%, transparent 100%);
+}
 
 * {
     margin: 0;

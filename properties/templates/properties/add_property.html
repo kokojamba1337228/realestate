@@ -1,5 +1,5 @@
 {% load static %}
-{% load bootstrap5 %}
+{% load django_bootstrap5 %}
 <html lang="en">
 
 <head>
@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{% static 'properties/fontawesome/css/all.min.css' %}">
     <link rel="stylesheet" href="{% static 'properties/scss/add_property.scss' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="{% static 'properties/scss/footer.scss' %}">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <title>Ваше объявление</title>
@@ -61,13 +62,18 @@
                 </div>
             </div>
             <div id="imagePreviewContainer" class="image-preview-container"></div>
-
-
+            <p class="picture" style="margin-top: 20px;">Теги</p>
+            <div class="form-group tags">
+                {% for checkbox in form.tags %}
+                    <div>
+                        {{ checkbox.tag }} {{ checkbox.choice_label }}
+                    </div>
+                {% endfor %}
+            </div>
             <button type="submit" class="btn btn-primary mt-3">Подать объявление</button>
         </form>
     </div>
-
-    {% include 'properties/elements/footer.html' %}
+    {% include 'properties/elements/footer.html' %} 
 
     <script>
         document.getElementById('id_images').addEventListener('change', function (event) {

@@ -30,10 +30,9 @@ class Message(models.Model):
         return f"Сообщение от {self.sender.first_name}: {self.content[:50]}..."  
 
 class SupportChat(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='support_chats')
-    receiver = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=get_admin_user)
+    user = models.ForeignKey(CustomUser, related_name='user_chats', on_delete=models.CASCADE, null=True)
+    admin = models.ForeignKey(CustomUser, related_name='admin_chats', on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
     def __str__(self):
         return f"Chat between {self.user.email} and Admin"
 
@@ -41,7 +40,7 @@ class SupportMessage(models.Model):
     chat = models.ForeignKey(SupportChat, on_delete=models.CASCADE, related_name='messages')
     sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     content = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['timestamp']
+        ordering = ['created_at']

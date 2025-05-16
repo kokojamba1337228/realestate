@@ -10,6 +10,8 @@ urlpatterns = [
     path('detail/<int:id>/', property_detail, name='property_detail'),
     path('remove-favorite/<int:property_id>/', remove_favorite, name='remove_favorite'),
     path('update/<int:property_id>/', update_property, name='update_property'),
+    path('toggle-favorite/<int:property_id>/', toggle_favorite, name='toggle_favorite'),
+
 ] 
 
 if settings.DEBUG:

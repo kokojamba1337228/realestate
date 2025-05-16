@@ -11,16 +11,24 @@ body, html {
     width: 45%;
     text-align: center;
     justify-content: center;
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    margin-top: 5%;
 }
 
 .form-group {
     position: relative;
     display: flex;
     margin: 20px 0; 
+}
+
+.form-group.tags {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 10px 20px; 
+    align-items: center;
+}
+
+.form-group.tags div {
+    align-items: center;
 }
 
 .form-icon {

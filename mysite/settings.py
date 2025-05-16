@@ -30,7 +30,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'bootstrap5',
+    'django_bootstrap5',
     'properties',
     'chat',
     'polls',

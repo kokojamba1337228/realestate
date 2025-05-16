@@ -1,4 +1,6 @@
 {% load static %}
+{% load django_bootstrap5 %}
+
 <html lang="ru">
 
 <head>
@@ -76,215 +78,247 @@
                 </div>
             </div>
         </div>
+
         <h2>Доступная недвижимость</h2>
         <div class="main-section">
-        <div class="tags-filter-panel">
-            <h4>Фильтр по тегам</h4>
-            <form id="tagsFilterForm">
-                {% for tag in tags %}
+            <div class="tags-filter-panel">
+                <h4>Фильтр по тегам</h4>
+                <form id="tagsFilterForm">
+                    {% for tag in tags %}
                     <div>
                         <input type="checkbox" id="tag_{{ tag.id }}" name="tags" value="{{ tag.id }}">
                         <label for="tag_{{ tag.id }}">{{ tag.name }}</label>
                     </div>
-                {% endfor %}
-            </form>
-        </div>
-        
-        <div class="property-list">
-            {% for property in properties %}
-            <div class="property-card" data-property-id="{{ property.id }}">
-                <a href="{% url 'property_detail' property.id %}" class="property-link">
-                    <div class="property-image-container">
-                        {% if property.images.all %}
-                        <img src="{{ property.images.first.image.url }}" alt="Property Image" class="property-image" />
-                        {% else %}
-                        <img
-                            src="{% static 'properties/images/default.jpg' %}"
-                            alt="No Image Available"
-                            class="property-image"
-                        />
-                        {% endif %}
-                    </div>
-                </a>
-                <div class="favorite-btn-wrapper">
-                    {% csrf_token %}
-                    <i
-                        class="favorite-btn fa-heart {% if property.id in favorite_properties %}fas{% else %}far{% endif %}"
-                        onclick="removeFavorite({{ property.id }})"
-                    ></i>
-                </div>
-                <a href="{% url 'property_detail' property.id %}" class="property-link">
-                    <p class="title">{{ property.title }}</p>
-                    <p class="price"><strong>Цена:</strong> {{ property.price }} BYN</p>
-                    <p><strong>Адрес:</strong> {{ property.location }}</p>
-                    <p><strong>Площадь:</strong> {{ property.size }} м²</p>
-                    <p>{{ property.description }}</p>
-                </a>
-                <div class="property-tags">
-                    {% for tag in property.tags.all %}
-                        <span class="tag">{{ tag.name }}</span>
-                    {% empty %}
-                        <span class="no-tags">Без тегов</span>
                     {% endfor %}
-                </div>
+                </form>
             </div>
-            {% empty %}
-            <p>Нет доступных объектов недвижимости</p>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-    <button class="support-btn">
-        <i class="fas fa-comments"></i> Поддержка
-    </button>
 
-        <div class="support-chat-dropdown" id="support-chat-dropdown" style="display: none;">
-            <div class="chat-header">
-                <strong>Поддержка</strong>
-                <button id="chat-close-btn" title="Закрыть">×</button>
-            </div>
-            <div class="chat-messages" id="chat-messages"></div>
-            <div class="chat-input-container">
-                <textarea id="chat-input" placeholder="Введите сообщение..."></textarea>
-                <button id="chat-send-btn">➤</button>
+            <div class="property-list">
+                {% csrf_token %}
+                {% for property in page_obj %}
+                {% if property.approved %}
+                <div class="property-card" data-property-id="{{ property.id }}">
+                    <a href="{% url 'property_detail' property.id %}" class="property-link">
+                        <div class="property-image-container">
+                            {% if property.images.all %}
+                            <img src="{{ property.images.first.image.url }}" alt="Property Image" class="property-image" />
+                            {% else %}
+                            <img src="{% static 'properties/images/default.jpg' %}" alt="No Image Available" class="property-image" />
+                            {% endif %}
+                        </div>
+                    </a>
+                    <div class="favorite-btn-wrapper">
+                        <i
+                            class="favorite-btn fa-heart {% if property.id in favorite_properties %}fas{% else %}far{% endif %}"
+                            data-property-id="{{ property.id }}"
+                        ></i>
+                    </div>
+                    <a href="{% url 'property_detail' property.id %}" class="property-link">
+                        <p class="title">{{ property.title }}</p>
+                        <p class="price"><strong>Цена:</strong> {{ property.price }} BYN</p>
+                        <p><strong>Адрес:</strong> {{ property.location }}</p>
+                        <p><strong>Площадь:</strong> {{ property.size }} м²</p>
+                        <p>{{ property.description }}</p>
+                    </a>
+                    <div class="property-tags">
+                        {% for tag in property.tags.all %}
+                        <span class="tag" data-tag-id="{{ tag.id }}">{{ tag.name }}</span>
+                        {% empty %}
+                        <span class="no-tags"></span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% empty %}
+                <p>Нет доступных объектов недвижимости</p>
+                {% endfor %}
             </div>
         </div>
     </div>
-    
+
+    <button class="support-btn"><i class="fas fa-comments"></i></button>
+
+    <div class="support-chat-dropdown" id="support-chat-dropdown" style="display: none;">
+        <div class="chat-header">
+            <strong>Поддержка</strong>
+            <button id="chat-close-btn" title="Закрыть">×</button>
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input-container">
+            <textarea id="chat-input" placeholder="Введите сообщение..."></textarea>
+            <button id="chat-send-btn">➤</button>
+        </div>
+    </div>
+
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1{% if query_string %}&{{ query_string }}{% endif %}">&laquo; Первая</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if query_string %}&{{ query_string }}{% endif %}">Предыдущая</a>
+        {% endif %}
+
+        <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if query_string %}&{{ query_string }}{% endif %}">Следующая</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if query_string %}&{{ query_string }}{% endif %}">Последняя &raquo;</a>
+        {% endif %}
+    </div>
 
     <script>
-        const supportBtn = document.querySelector('.support-btn');
-        const dropdown = document.getElementById('support-chat-dropdown');
-        const closeBtn = document.getElementById('chat-close-btn');
-        const messagesBox = document.getElementById('chat-messages');
-        const inputBox = document.getElementById('chat-input');
-        const sendBtn = document.getElementById('chat-send-btn');
-
-        supportBtn.addEventListener('click', () => {
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-            if (dropdown.style.display === 'block') {
-                fetchMessages();
+        function getCSRFToken() {
+            const name = 'csrftoken';
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    return decodeURIComponent(cookie.substring(name.length + 1));
+                }
             }
-        });
-
-        closeBtn.addEventListener('click', () => {
-            dropdown.style.display = 'none';
-        });
-
-        function fetchMessages() {
-            fetch('{% url "get_support_messages" %}')
-                .then(res => res.json())
-                .then(data => {
-                    messagesBox.innerHTML = '';
-                    data.messages.forEach(msg => {
-                        const el = document.createElement('div');
-                        el.classList.add('chat-message');
-
-                        const avatarUrl = msg.sender_avatar || '/static/default-avatar.png';
-                        const avatar = document.createElement('img');
-                        avatar.src = avatarUrl;
-                        avatar.classList.add('chat-avatar');
-
-                        const content = document.createElement('div');
-                        content.classList.add('chat-message-content');
-                        content.textContent = msg.sender__first_name + ': ' + msg.content;
-
-                        el.appendChild(avatar);
-                        el.appendChild(content);
-                        messagesBox.appendChild(el);
-                    });
-                    messagesBox.scrollTop = messagesBox.scrollHeight;
-                });
+            return null;
         }
 
-        sendBtn.addEventListener('click', () => {
-            const content = inputBox.value.trim();
-            if (!content) return;
+        document.addEventListener('DOMContentLoaded', function () {
+            const filterBtn = document.getElementById('filter-btn');
+            const filterMenu = document.getElementById('filter-menu');
+            filterBtn?.addEventListener('click', () => {
+                filterMenu.style.display = filterMenu.style.display === 'block' ? 'none' : 'block';
+            });
 
+            const priceMin = document.getElementById('price-min');
+            const priceMax = document.getElementById('price-max');
+            const priceMinDisplay = document.getElementById('price-min-display');
+            const priceMaxDisplay = document.getElementById('price-max-display');
+
+            function updatePriceDisplay() {
+                if (priceMin && priceMinDisplay) priceMinDisplay.textContent = priceMin.value;
+                if (priceMax && priceMaxDisplay) priceMaxDisplay.textContent = priceMax.value;
+            }
+            priceMin?.addEventListener('input', updatePriceDisplay);
+            priceMax?.addEventListener('input', updatePriceDisplay);
+            updatePriceDisplay();
+
+            const tagCheckboxes = document.querySelectorAll('input[name="tags"]');
+            const propertyCards = document.querySelectorAll('.property-card');
+
+            tagCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    const selectedTags = Array.from(tagCheckboxes)
+                        .filter(cb => cb.checked)
+                        .map(cb => cb.value);
+
+                    propertyCards.forEach(card => {
+                        const cardTagIds = Array.from(card.querySelectorAll('.property-tags .tag'))
+                            .map(tag => tag.dataset.tagId);
+
+                        const matches = selectedTags.every(tagId => cardTagIds.includes(tagId));
+                        card.style.display = selectedTags.length === 0 || matches ? 'block' : 'none';
+                    });
+                });
+            });
+
+            const supportBtn = document.querySelector('.support-btn');
+            const dropdown = document.getElementById('support-chat-dropdown');
+            const closeBtn = document.getElementById('chat-close-btn');
+            const messagesBox = document.getElementById('chat-messages');
+            const inputBox = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('chat-send-btn');
+
+            supportBtn.addEventListener('click', () => {
+                if (dropdown.style.display === 'block') {
+                    dropdown.style.display = 'none';
+                } else {
+                    dropdown.style.display = 'block';
+                    fetchMessages();
+                }
+            });
+
+            closeBtn.addEventListener('click', () => {
+                dropdown.style.display = 'none';
+            });
+
+            function fetchMessages() {
+                fetch('{% url "get_support_messages" %}')
+                    .then(res => res.json())
+                    .then(data => {
+                        messagesBox.innerHTML = '';
+                        data.messages.forEach(msg => {
+                            const el = document.createElement('div');
+                            el.classList.add('chat-message');
+
+                            const avatar = document.createElement('img');
+                            avatar.src = msg.sender_avatar || '{% static "properties/images/default-avatar.png" %}';
+                            avatar.classList.add('chat-avatar');
+
+                            const content = document.createElement('div');
+                            content.classList.add('chat-message-content');
+                            content.textContent = msg.sender__first_name + ': ' + msg.content;
+
+                            el.appendChild(avatar);
+                            el.appendChild(content);
+                            messagesBox.appendChild(el);
+                        });
+                        messagesBox.scrollTop = messagesBox.scrollHeight;
+                    });
+            }
+
+            sendBtn.addEventListener('click', () => {
+                const content = inputBox.value.trim();
+                if (!content) return;
             fetch('{% url "send_support_message" %}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
+                    'X-CSRFToken': getCSRFToken(),
                 },
-                body: JSON.stringify({ content })
+                body: JSON.stringify({ content }),
+                })
+            .then(res => {
+                if (!res.ok) throw new Error('Ошибка отправки сообщения');
+                    return res.json();
+                })
+            .then(data => {
+                inputBox.value = '';
+                fetchMessages();
             })
-                .then(res => res.json())
-                .then(() => {
-                    inputBox.value = '';
-                    fetchMessages();
-                });
-        });
-        
+                .catch(console.error);
+            });
+            document.querySelectorAll('.favorite-btn').forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            const propertyId = this.dataset.propertyId;
+            const icon = this;
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const filterBtn = document.querySelector('.filter-button');
-            const filterMenu = document.querySelector('.filter-menu');
-
-            if (filterBtn && filterMenu) {
-                filterBtn.addEventListener('click', function () {
-                    filterMenu.style.display = filterMenu.style.display === 'block' ? 'none' : 'block';
-                });
-            }
-        });
-
-        document.addEventListener('click', function (event) {
-            const menu = document.getElementById('filter-menu');
-            const filterButton = document.getElementById('filter-btn');
-            if (
-                !filterButton.contains(event.target) &&
-                !menu.contains(event.target)
-            ) {
-                menu.style.display = 'none';
-            }
-        });
-
-        function updatePriceDisplay() {
-            const priceMin = document.getElementById('price-min');
-            const priceMax = document.getElementById('price-max');
-            document.getElementById('price-min-display').textContent = priceMin.value;
-            document.getElementById('price-max-display').textContent = priceMax.value;
-        }
-
-        function removeFavorite(propertyId) {
-            const heartIcon = document.querySelector(
-                `.property-card[data-property-id="${propertyId}"] .favorite-btn`
-            );
-            fetch(window.location.href, {
+            fetch(`/toggle-favorite/${propertyId}/`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-CSRFToken': getCSRFToken(),
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ property_id: propertyId }),
             })
-                .then((response) => {
-                    if (response.status === 403) {
-                        window.location.href =
-                            '{% url "login" %}?next=' +
-                            encodeURIComponent(window.location.pathname) +
-                            '&unauth_favorite=true';
-                        return Promise.reject('Authentication required');
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    if (data.status === 'added') {
-                        heartIcon.classList.remove('far');
-                        heartIcon.classList.add('fas');
-                    } else if (data.status === 'removed') {
-                        heartIcon.classList.remove('fas');
-                        heartIcon.classList.add('far');
-                    }
-                })
-                .catch((error) => {
-                    if (error !== 'Authentication required') {
-                        console.error('An error occurred:', error);
-                    }
-                });
-        }
-    </script>
+            .then(response => {
+                if (response.status === 403) {
+                    window.location.href = `/login/?next=${window.location.pathname}`;
+                    return Promise.reject('Not authenticated');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'added') {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                } else if (data.status === 'removed') {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                }
+            })
+            .catch(error => {
+                if (error !== 'Not authenticated') {
+                    console.error('Error toggling favorite:', error);
+                }
+            });
+        });
+    });
 
-    {% include 'properties/elements/footer.html' %}
+</script>
 </body>
 </html>

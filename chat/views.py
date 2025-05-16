@@ -88,7 +88,7 @@ def send_support_message(request):
         content = data.get('content')
 
         admin = CustomUser.objects.filter(is_superuser=True).first()
-        chat, created = SupportChat.objects.get_or_create(user=request.user, admin=admin)
+        chat, created_at = SupportChat.objects.get_or_create(user=request.user, admin=admin)
 
         message = SupportMessage.objects.create(chat=chat, sender=request.user, content=content)
         return JsonResponse({'status': 'ok', 'message': message.content})
@@ -109,7 +109,7 @@ def get_support_messages(request):
             'sender__first_name': msg.sender.first_name,
             'sender__id': msg.sender.id,
             'content': msg.content,
-            'timestamp': msg.timestamp.isoformat(),
+            'timestamp': msg.created_at.isoformat(),
             'sender_avatar': msg.sender.avatar.url if msg.sender.avatar else ''
         })
 
@@ -138,3 +138,20 @@ def get_chat_messages(request, chat_id):
     chat = get_object_or_404(SupportChat, id=chat_id)
     messages = chat.messages.all().values('sender__first_name', 'sender__id', 'content', 'timestamp')
     return JsonResponse({'messages': list(messages)})
+
+@staff_member_required 
+def admin_dashboard(request):
+    chats = SupportChat.objects.all().order_by('-created_at') 
+    return render(request, 'chat/admin_dashboard.html', {'chats': chats})
+
+@staff_member_required
+def admin_chat_detail(request, chat_id):
+    chat = SupportChat.objects.get(id=chat_id)
+
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        if content:
+            SupportMessage.objects.create(chat=chat, sender=request.user, content=content)
+    
+    messages = chat.messages.order_by('created_at')
+    return render(request, 'chat/admin_chat_detail.html', {'chat': chat, 'messages': messages})

@@ -1,5 +1,5 @@
 {% load static %}
-{% load bootstrap5 %}
+{% load django_bootstrap5 %}
 <html lang="ru">
 
 <head>
@@ -65,7 +65,12 @@
         {% else %}
         <p>Для начала чата необходимо войти в аккаунт.</p>
         {% endif %}
-        <div id="map" style="height: 500px; width: 700px; position: relative; border-radius: 20px; margin-top: 20px;"></div>
+        <div class="tags">
+        {% for tag in property.get_tags_list %}
+            <span class="tag">{{ tag }}</span>
+        {% endfor %}
+        </div>
+        <div id="map" style="height: 600px; width: 100%; position: relative; border-radius: 20px; margin-top: 2%; "></div>
 
     </div>
     <div id="warning-message" class="warning-message">

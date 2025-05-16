@@ -1,5 +1,5 @@
 {% load static %}
-{% load bootstrap5 %}
+{% load django_bootstrap5 %}
 <html lang="ru">
 
 <head>
@@ -15,6 +15,7 @@
 <body>
 {% include 'properties/elements/header.html' %}
 <div class="chat-list-container">
+    <h2 style="margin-top: 10px; margin-bottom: 20px;">Ваши чаты</h2>
     {% for chat_item in chats %}
     <a href="{% url 'chat_detail' chat_item.chat.id %}" class="chat-link">
     <div class="chat-card">
