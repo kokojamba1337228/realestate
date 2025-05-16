@@ -10,6 +10,7 @@ from chat.models import Chat
 from django.contrib import messages
 from django.http import Http404
 
+
 def property_detail(request, id):
     property = Property.objects.get(id=id)
     if request.method == 'POST' and 'create_chat' not in request.POST:

@@ -1,8 +1,10 @@
 from django.urls import path
-from . import views
+from .views import *
 
 urlpatterns = [
-    path('', views.chat_list, name='chat_list'),
-    path('create/<int:property_id>/', views.create_chat, name='create_chat'),
-    path('<int:chat_id>/', views.chat_detail, name='chat_detail'),
-    path('delete/<int:chat_id>/', views.delete_chat, name='delete_chat')]
+    path('', chat_list, name='chat_list'),
+    path('create/<int:property_id>/', create_chat, name='create_chat'),
+    path('<int:chat_id>/', chat_detail, name='chat_detail'),
+    path('delete/<int:chat_id>/', delete_chat, name='delete_chat'),
+    path('send/', send_support_message, name='send_support_message'),
+    path('get/', get_support_messages, name='get_support_messages'),]

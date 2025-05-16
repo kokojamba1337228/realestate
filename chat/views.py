@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse
-from .models import Chat, Message
+from .models import Chat, Message, SupportChat, SupportMessage
 from properties.models import Property
+from polls.models import CustomUser
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+import json
 from django.db.models import Q
 
 
@@ -76,3 +79,62 @@ def delete_chat(request, chat_id):
         chat.delete()
         return redirect('chat_list')
     return HttpResponseNotAllowed(['POST'])
+
+@login_required
+@csrf_exempt
+def send_support_message(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        content = data.get('content')
+
+        admin = CustomUser.objects.filter(is_superuser=True).first()
+        chat, created = SupportChat.objects.get_or_create(user=request.user, admin=admin)
+
+        message = SupportMessage.objects.create(chat=chat, sender=request.user, content=content)
+        return JsonResponse({'status': 'ok', 'message': message.content})
+    return JsonResponse({'status': 'error'}, status=400)
+
+@login_required
+def get_support_messages(request):
+    admin = CustomUser.objects.filter(is_superuser=True).first()
+    chat = SupportChat.objects.filter(user=request.user, admin=admin).first()
+
+    if not chat:
+        return JsonResponse({'messages': []})
+
+    messages = chat.messages.select_related('sender').all()
+    message_data = []
+    for msg in messages:
+        message_data.append({
+            'sender__first_name': msg.sender.first_name,
+            'sender__id': msg.sender.id,
+            'content': msg.content,
+            'timestamp': msg.timestamp.isoformat(),
+            'sender_avatar': msg.sender.avatar.url if msg.sender.avatar else ''
+        })
+
+    return JsonResponse({'messages': message_data})
+
+from django.contrib.admin.views.decorators import staff_member_required
+
+@staff_member_required
+def admin_support_dashboard(request):
+    chats = SupportChat.objects.select_related('user').all()
+    return render(request, 'chat/admin_dashboard.html', {'chats': chats})
+
+@staff_member_required
+@csrf_exempt
+def admin_send_message(request, chat_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        content = data.get('content')
+        chat = get_object_or_404(SupportChat, id=chat_id)
+        SupportMessage.objects.create(chat=chat, sender=request.user, content=content)
+        return JsonResponse({'status': 'ok'})
+    return JsonResponse({'status': 'error'}, status=400)
+
+@staff_member_required
+def get_chat_messages(request, chat_id):
+    chat = get_object_or_404(SupportChat, id=chat_id)
+    messages = chat.messages.all().values('sender__first_name', 'sender__id', 'content', 'timestamp')
+    return JsonResponse({'messages': list(messages)})

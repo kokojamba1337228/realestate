@@ -1,5 +1,5 @@
 from django import forms
-from .models import Property
+from .models import Property, Tag
 
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
@@ -19,7 +19,21 @@ class MultipleFileField(forms.FileField):
 
 class PropertyForm(forms.ModelForm):
     images = MultipleFileField(required=False)
-    
+
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+
     class Meta:
         model = Property
-        fields = ['title', 'description', 'price', 'location', 'size']
+        fields = ['title', 'description', 'price', 'location', 'size', 'tags'] 
+
+class SupportMessageForm(forms.Form):
+    content = forms.CharField(widget=forms.Textarea(attrs={
+        'placeholder': 'Ваш вопрос...',
+        'rows': 4
+    }), max_length=1000)
+
+

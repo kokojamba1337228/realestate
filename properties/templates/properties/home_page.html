@@ -2,14 +2,14 @@
 <html lang="ru">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'properties/fontawesome/css/all.min.css' %}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'properties/scss/home.scss' %}">
-    <title>Доступные объявления</title>   
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{% static 'properties/fontawesome/css/all.min.css' %}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'properties/scss/home.scss' %}" />
+    <title>Доступные объявления</title>
 </head>
 
 <body>
@@ -24,23 +24,43 @@
                     class="search-input"
                     placeholder="Поиск по названию"
                     value="{{ query|default:'' }}"
-                >
+                />
                 <button type="submit" class="search-button">Искать</button>
             </form>
-    
+
             <div class="filter-container">
                 <button id="filter-btn" class="filter-button">Фильтры</button>
                 <div id="filter-menu" class="filter-menu" style="display: none;">
                     <form method="get" action="{% url 'home_page' %}" class="filter-form">
                         <div class="filter-item">
                             <label for="price-min">Цена от:</label>
-                            <input type="range" name="price_min" id="price-min" class="filter-input" min="0" max="{{ max_price }}" value="{{ price_min|default:0 }}" step="1" oninput="updatePriceDisplay()">
-                            <span id="price-min-display">{{ price_min }}</span> BYN
+                            <input
+                                type="range"
+                                name="price_min"
+                                id="price-min"
+                                class="filter-input"
+                                min="0"
+                                max="{{ max_price }}"
+                                value="{{ price_min|default:0 }}"
+                                step="1"
+                                oninput="updatePriceDisplay()"
+                            />
+                            <span id="price-min-display">{{ price_min|default:"0" }}</span> BYN
                         </div>
                         <div class="filter-item">
                             <label for="price-max">Цена до:</label>
-                            <input type="range" name="price_max" id="price-max" class="filter-input" min="0" max="{{ max_price }}" value="{{ price_max|default:max_price }}" step="1" oninput="updatePriceDisplay()">
-                            <span id="price-max-display">{{ price_max }}</span> BYN
+                            <input
+                                type="range"
+                                name="price_max"
+                                id="price-max"
+                                class="filter-input"
+                                min="0"
+                                max="{{ max_price }}"
+                                value="{{ price_max|default:max_price }}"
+                                step="1"
+                                oninput="updatePriceDisplay()"
+                            />
+                            <span id="price-max-display">{{ price_max|default:max_price }}</span> BYN
                         </div>
                         <div class="filter-item">
                             <label for="sorting">Сортировать по:</label>
@@ -50,56 +70,171 @@
                                 <option value="price_desc" {% if order_by == 'price_desc' %}selected{% endif %}>По убыванию</option>
                             </select>
                         </div>
-                        <input type="hidden" name="query" value="{{ query }}">
+                        <input type="hidden" name="query" value="{{ query|default:'' }}" />
                         <button type="submit" class="filter-submit">Применить фильтры</button>
                     </form>
-                    
                 </div>
             </div>
         </div>
-    
         <h2>Доступная недвижимость</h2>
+        <div class="main-section">
+        <div class="tags-filter-panel">
+            <h4>Фильтр по тегам</h4>
+            <form id="tagsFilterForm">
+                {% for tag in tags %}
+                    <div>
+                        <input type="checkbox" id="tag_{{ tag.id }}" name="tags" value="{{ tag.id }}">
+                        <label for="tag_{{ tag.id }}">{{ tag.name }}</label>
+                    </div>
+                {% endfor %}
+            </form>
+        </div>
+        
         <div class="property-list">
             {% for property in properties %}
-                <div class="property-card" data-property-id="{{ property.id }}">
-                    <a href="{% url 'property_detail' property.id %}" class="property-link">
-                        <div class="property-image-container">
-                            {% if property.images.all %}
-                                <img src="{{ property.images.first.image.url }}" alt="Property Image" class="property-image">
-                            {% else %}
-                                <img src="{% static 'properties/images/default.jpg' %}" alt="No Image Available" class="property-image">
-                            {% endif %}
-                        </div>
-                    </a>
-                    <div class="favorite-btn-wrapper">
-                        {% csrf_token %}
-                        <i class="favorite-btn fa-heart {% if property.id in favorite_properties %}fas{% else %}far{% endif %}" onclick="removeFavorite({{ property.id }})"></i>
+            <div class="property-card" data-property-id="{{ property.id }}">
+                <a href="{% url 'property_detail' property.id %}" class="property-link">
+                    <div class="property-image-container">
+                        {% if property.images.all %}
+                        <img src="{{ property.images.first.image.url }}" alt="Property Image" class="property-image" />
+                        {% else %}
+                        <img
+                            src="{% static 'properties/images/default.jpg' %}"
+                            alt="No Image Available"
+                            class="property-image"
+                        />
+                        {% endif %}
                     </div>
-                    <a href="{% url 'property_detail' property.id %}" class="property-link">
-                        <p class="title">{{ property.title }}</p>
-                        <p class="price"><strong>Цена:</strong> {{ property.price }} BYN</p>
-                        <p><strong>Адрес:</strong> {{ property.location }}</p>
-                        <p><strong>Площадь:</strong> {{ property.size }} м²</p>
-                        <p>{{ property.description }}</p>
-                    </a>
+                </a>
+                <div class="favorite-btn-wrapper">
+                    {% csrf_token %}
+                    <i
+                        class="favorite-btn fa-heart {% if property.id in favorite_properties %}fas{% else %}far{% endif %}"
+                        onclick="removeFavorite({{ property.id }})"
+                    ></i>
                 </div>
+                <a href="{% url 'property_detail' property.id %}" class="property-link">
+                    <p class="title">{{ property.title }}</p>
+                    <p class="price"><strong>Цена:</strong> {{ property.price }} BYN</p>
+                    <p><strong>Адрес:</strong> {{ property.location }}</p>
+                    <p><strong>Площадь:</strong> {{ property.size }} м²</p>
+                    <p>{{ property.description }}</p>
+                </a>
+                <div class="property-tags">
+                    {% for tag in property.tags.all %}
+                        <span class="tag">{{ tag.name }}</span>
+                    {% empty %}
+                        <span class="no-tags">Без тегов</span>
+                    {% endfor %}
+                </div>
+            </div>
             {% empty %}
-                <p>Нет доступных объектов недвижимости</p>
+            <p>Нет доступных объектов недвижимости</p>
             {% endfor %}
         </div>
     </div>
+</div>
+    <button class="support-btn">
+        <i class="fas fa-comments"></i> Поддержка
+    </button>
+
+        <div class="support-chat-dropdown" id="support-chat-dropdown" style="display: none;">
+            <div class="chat-header">
+                <strong>Поддержка</strong>
+                <button id="chat-close-btn" title="Закрыть">×</button>
+            </div>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-container">
+                <textarea id="chat-input" placeholder="Введите сообщение..."></textarea>
+                <button id="chat-send-btn">➤</button>
+            </div>
+        </div>
+    </div>
+    
 
     <script>
-        document.getElementById('filter-btn').addEventListener('click', function (event) {
-            const menu = document.getElementById('filter-menu');
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-            event.stopPropagation();
+        const supportBtn = document.querySelector('.support-btn');
+        const dropdown = document.getElementById('support-chat-dropdown');
+        const closeBtn = document.getElementById('chat-close-btn');
+        const messagesBox = document.getElementById('chat-messages');
+        const inputBox = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('chat-send-btn');
+
+        supportBtn.addEventListener('click', () => {
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            if (dropdown.style.display === 'block') {
+                fetchMessages();
+            }
+        });
+
+        closeBtn.addEventListener('click', () => {
+            dropdown.style.display = 'none';
+        });
+
+        function fetchMessages() {
+            fetch('{% url "get_support_messages" %}')
+                .then(res => res.json())
+                .then(data => {
+                    messagesBox.innerHTML = '';
+                    data.messages.forEach(msg => {
+                        const el = document.createElement('div');
+                        el.classList.add('chat-message');
+
+                        const avatarUrl = msg.sender_avatar || '/static/default-avatar.png';
+                        const avatar = document.createElement('img');
+                        avatar.src = avatarUrl;
+                        avatar.classList.add('chat-avatar');
+
+                        const content = document.createElement('div');
+                        content.classList.add('chat-message-content');
+                        content.textContent = msg.sender__first_name + ': ' + msg.content;
+
+                        el.appendChild(avatar);
+                        el.appendChild(content);
+                        messagesBox.appendChild(el);
+                    });
+                    messagesBox.scrollTop = messagesBox.scrollHeight;
+                });
+        }
+
+        sendBtn.addEventListener('click', () => {
+            const content = inputBox.value.trim();
+            if (!content) return;
+
+            fetch('{% url "send_support_message" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ content })
+            })
+                .then(res => res.json())
+                .then(() => {
+                    inputBox.value = '';
+                    fetchMessages();
+                });
+        });
+        
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const filterBtn = document.querySelector('.filter-button');
+            const filterMenu = document.querySelector('.filter-menu');
+
+            if (filterBtn && filterMenu) {
+                filterBtn.addEventListener('click', function () {
+                    filterMenu.style.display = filterMenu.style.display === 'block' ? 'none' : 'block';
+                });
+            }
         });
 
         document.addEventListener('click', function (event) {
             const menu = document.getElementById('filter-menu');
             const filterButton = document.getElementById('filter-btn');
-            if (!filterButton.contains(event.target) && !menu.contains(event.target)) {
+            if (
+                !filterButton.contains(event.target) &&
+                !menu.contains(event.target)
+            ) {
                 menu.style.display = 'none';
             }
         });
@@ -112,38 +247,42 @@
         }
 
         function removeFavorite(propertyId) {
-            const heartIcon = document.querySelector(`.property-card[data-property-id="${propertyId}"] .favorite-btn`);
+            const heartIcon = document.querySelector(
+                `.property-card[data-property-id="${propertyId}"] .favorite-btn`
+            );
             fetch(window.location.href, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': '{{ csrf_token }}',
                 },
-                body: JSON.stringify({ property_id: propertyId })
+                body: JSON.stringify({ property_id: propertyId }),
             })
-            .then(response => {
-                if (response.status === 403) {
-                    window.location.href = "{% url 'login' %}?next=" + encodeURIComponent(window.location.pathname) + "&unauth_favorite=true";
-                    return Promise.reject('Authentication required');
-                }
-                return response.json();
-            })
-            .then(data => { 
-                if (data.status === 'added') {
-                    heartIcon.classList.remove('far');
-                    heartIcon.classList.add('fas');
-                } else if (data.status === 'removed') {
-                    heartIcon.classList.remove('fas');
-                    heartIcon.classList.add('far');
-                }
-            })
-            .catch(error => {
-                if (error !== 'Authentication required') {
-                    console.error('An error occurred:', error);
-                }
-            });
+                .then((response) => {
+                    if (response.status === 403) {
+                        window.location.href =
+                            '{% url "login" %}?next=' +
+                            encodeURIComponent(window.location.pathname) +
+                            '&unauth_favorite=true';
+                        return Promise.reject('Authentication required');
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    if (data.status === 'added') {
+                        heartIcon.classList.remove('far');
+                        heartIcon.classList.add('fas');
+                    } else if (data.status === 'removed') {
+                        heartIcon.classList.remove('fas');
+                        heartIcon.classList.add('far');
+                    }
+                })
+                .catch((error) => {
+                    if (error !== 'Authentication required') {
+                        console.error('An error occurred:', error);
+                    }
+                });
         }
-             
     </script>
 
     {% include 'properties/elements/footer.html' %}

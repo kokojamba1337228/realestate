@@ -8,6 +8,9 @@ def get_default_buyer():
 def get_default_seller():
     return CustomUser.objects.first()  
 
+def get_admin_user():
+    return CustomUser.objects.filter(is_superuser=True).first().pk
+
 class Chat(models.Model):
     buyer = models.ForeignKey(CustomUser, related_name="buyer_chats", on_delete=models.CASCADE, default=get_default_buyer)
     seller = models.ForeignKey(CustomUser, related_name="seller_chats", on_delete=models.CASCADE, default=get_default_seller)
@@ -25,3 +28,20 @@ class Message(models.Model):
 
     def __str__(self):
         return f"Сообщение от {self.sender.first_name}: {self.content[:50]}..."  
+
+class SupportChat(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='support_chats')
+    receiver = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=get_admin_user)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Chat between {self.user.email} and Admin"
+
+class SupportMessage(models.Model):
+    chat = models.ForeignKey(SupportChat, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['timestamp']
