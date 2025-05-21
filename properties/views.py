@@ -122,6 +122,30 @@ def home_page(request):
 
     favorite_properties = request.user.favorites.values_list('id', flat=True) if request.user.is_authenticated else []
 
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            property_id = data.get('property_id')
+
+            if request.user.is_authenticated:
+                try:
+                    property = Property.objects.get(id=property_id)
+                except Property.DoesNotExist:
+                    return JsonResponse({'status': 'not_found'}, status=404)
+
+                if property in request.user.favorites.all():
+                    request.user.favorites.remove(property)
+                    status = 'removed'
+                else:
+                    request.user.favorites.add(property)
+                    status = 'added'
+
+                return JsonResponse({'status': status})
+            else:
+                return JsonResponse({'status': 'unauthenticated'}, status=403)
+        except (json.JSONDecodeError, KeyError):
+            return JsonResponse({'status': 'bad_request'}, status=400)
+    
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         html = ""
         for property in page_obj:
@@ -153,30 +177,9 @@ def home_page(request):
         'query_string': query_string,
     })
 
-
-
-
 @require_http_methods(["DELETE"])
 @login_required
 def remove_favorite(request, property_id):
     property = get_object_or_404(Property, id=property_id)
     request.user.favorites.remove(property)
     return JsonResponse({'success': True})
-
-@login_required
-@require_POST
-def toggle_favorite(request, property_id):
-    user = request.user
-    try:
-        property_obj = Property.objects.get(id=property_id)
-    except Property.DoesNotExist:
-        return JsonResponse({'error': 'Property not found'}, status=404)
-    
-    if property_obj in user.favorites.all():
-        user.favorites.remove(property_obj)
-        status = 'removed'
-    else:
-        user.favorites.add(property_obj)
-        status = 'added'
-    
-    return JsonResponse({'status': status})
