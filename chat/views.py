@@ -7,11 +7,14 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.db.models import Q
-
+from django.db.models import Max
 
 @login_required
 def chat_list(request):
-    chats = Chat.objects.filter(Q(buyer=request.user) | Q(seller=request.user))
+    chats = Chat.objects \
+        .filter(Q(buyer=request.user) | Q(seller=request.user)) \
+        .annotate(last_message_time=Max('messages__created_at')) \
+        .order_by('-last_message_time') 
     chat_data = []
 
     for chat in chats:
