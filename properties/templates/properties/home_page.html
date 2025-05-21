@@ -1,5 +1,5 @@
 {% load static %}
-{% load django_bootstrap5 %}
+{% load bootstrap5 %}
 
 <html lang="ru">
 
@@ -109,9 +109,10 @@
                     </a>
                     <div class="favorite-btn-wrapper">
                         <i
-                            class="favorite-btn fa-heart {% if property.id in favorite_properties %}fas{% else %}far{% endif %}"
-                            data-property-id="{{ property.id }}"
-                        ></i>
+                        class="favorite-btn fa-heart {% if property.id in favorite_properties %}fas{% else %}far{% endif %}"
+                        onclick="toggleFavorite({{ property.id }}, this)"
+                    ></i>
+                    
                     </div>
                     <a href="{% url 'property_detail' property.id %}" class="property-link">
                         <p class="title">{{ property.title }}</p>
@@ -165,16 +166,30 @@
     </div>
 
     <script>
-        function getCSRFToken() {
-            const name = 'csrftoken';
-            const cookies = document.cookie.split(';');
-            for (let cookie of cookies) {
-                cookie = cookie.trim();
-                if (cookie.startsWith(name + '=')) {
-                    return decodeURIComponent(cookie.substring(name.length + 1));
+        function toggleFavorite(propertyId, iconElement) {
+            fetch("{% url 'home_page' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({ property_id: propertyId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "added") {
+                    iconElement.classList.remove("far");
+                    iconElement.classList.add("fas");
+                } else if (data.status === "removed") {
+                    iconElement.classList.remove("fas");
+                    iconElement.classList.add("far");
+                } else if (data.status === "unauthenticated") {
+                    alert("Пожалуйста, войдите в систему, чтобы использовать избранное.");
                 }
-            }
-            return null;
+            })
+            .catch(error => {
+                console.error("Ошибка при добавлении в избранное:", error);
+            });
         }
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -282,43 +297,7 @@
             })
                 .catch(console.error);
             });
-            document.querySelectorAll('.favorite-btn').forEach(button => {
-        button.addEventListener('click', function (event) {
-            event.preventDefault();
-            const propertyId = this.dataset.propertyId;
-            const icon = this;
-
-            fetch(`/toggle-favorite/${propertyId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': getCSRFToken(),
-                    'Content-Type': 'application/json'
-                },
-            })
-            .then(response => {
-                if (response.status === 403) {
-                    window.location.href = `/login/?next=${window.location.pathname}`;
-                    return Promise.reject('Not authenticated');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.status === 'added') {
-                    icon.classList.remove('far');
-                    icon.classList.add('fas');
-                } else if (data.status === 'removed') {
-                    icon.classList.remove('fas');
-                    icon.classList.add('far');
-                }
-            })
-            .catch(error => {
-                if (error !== 'Not authenticated') {
-                    console.error('Error toggling favorite:', error);
-                }
-            });
         });
-    });
-
 </script>
 </body>
 </html>
