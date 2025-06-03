@@ -225,7 +225,7 @@ def user_login(request):
             messages.warning(request, 'Пожалуйста, войдите в аккаунт, чтобы использовать чаты.')
         if unauth_favorite:
             messages.warning(request, 'Пожалуйста, войдите в аккаунт, чтобы добавить в избранное.')
-
+        
     return render(request, 'polls/login.html', {'form': form})
 
 def user_logout(request):

@@ -164,8 +164,29 @@
             <a href="?page={{ page_obj.paginator.num_pages }}{% if query_string %}&{{ query_string }}{% endif %}">Последняя &raquo;</a>
         {% endif %}
     </div>
-
+    {% include 'properties/elements/footer.html' %}
+    
     <script>
+        document.addEventListener('click', function(event) {
+            const dropdown = document.querySelector('.filter-menu');
+            const toggleButton = document.querySelector('.filter-button');
+            const dropdown1 = document.querySelector('.support-chat-dropdown');
+            const supportButton = document.querySelector('.support-btn');
+
+            if (!dropdown || !toggleButton || !dropdown1 || !supportButton) return;
+        
+            const isClickInsideDropdown = dropdown.contains(event.target);
+            const isClickOnButton = toggleButton.contains(event.target);
+            const isClickInsideDropdown1 = dropdown1.contains(event.target);
+            const isClickOnButton1 = supportButton.contains(event.target);
+            if (!isClickInsideDropdown && !isClickOnButton) {
+                dropdown.style.display = 'none'; 
+            }
+            if(!isClickInsideDropdown1 && !isClickOnButton1){
+                dropdown1.style.display = 'none'; 
+            }
+
+        });
         function toggleFavorite(propertyId, iconElement) {
             fetch("{% url 'home_page' %}", {
                 method: "POST",

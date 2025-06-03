@@ -69,7 +69,10 @@ def add_property(request):
             for image in images:
                 PropertyImage.objects.create(property=property_instance, image=image)
 
+            messages.success(request, 'Объявление отправлено на модерацию.')
             return redirect('property_detail', id=property_instance.id)
+        else:
+            messages.error(request, 'Не удалось загрузить объявление. Проверьте правильность заполнения всех полей.')
     else:
         form = PropertyForm()
 

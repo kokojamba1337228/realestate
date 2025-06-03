@@ -37,16 +37,22 @@ footer {
 h2 {
     font-weight: 700;
     margin-bottom: 3%;
-    margin-top: 3%;
+    margin-top: 6%;
 }
 
 .search-container {
     display: flex;
+    position: fixed;
     align-items: center;
+    top: 7%;
     gap: 10px;
-    width: 60%;
-    margin-right: 1%;
+    width: 45%;
+    z-index: 99;
     flex-wrap: wrap;
+    background-color: rgba(255, 255, 255, 0.2); 
+    backdrop-filter: blur(5px); 
+    border-radius: 8px;         
+    padding: 15px;            
 }
 
 .filter-item {
@@ -56,7 +62,7 @@ h2 {
 .filter-menu {
     display: none;
     position: absolute;
-    top: 12%;
+    top: 100%;
     background-color: #fff;
     padding: 20px;
     border: 1px solid #ddd;
@@ -285,7 +291,7 @@ input[type="range"]::-moz-range-thumb {
 
 .chat-messages {
     flex-grow: 1;
-    overflow-y: auto;
+    height: 20%;
     padding: 10px;
     background: #f9f9f9;
 }
@@ -370,4 +376,8 @@ input[type="range"]::-moz-range-thumb {
     margin-right: 30%;
     display: flex;
     max-width: 700px;
+}
+
+.paginator{
+    margin-bottom: 1%;
 }

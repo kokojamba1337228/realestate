@@ -1,0 +1,36 @@
+{% load static %}
+{% load django_bootstrap5 %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'chat/fontawesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'chat/scss/chat_detail.scss' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    {% include 'properties/elements/header.html' %}
+
+<h1>Chat with {{ chat.user.get_full_name }}</h1>
+<div class="chat-container">
+
+<div class="chat-messages">
+  {% for msg in messages %}
+    <div class="{% if msg.sender.is_staff %}message admin{% else %}message user{% endif %}">
+      <strong>{{ msg.sender.get_full_name }}:</strong> {{ msg.content }}
+      <div class="timestamp">{{ ms    margin-top: 3%;g.created_at }}</div>
+    </div>
+  {% endfor %}
+</div>
+
+
+<form method="post">
+  {% csrf_token %}
+  <textarea name="content" rows="3" placeholder="Type your reply..."></textarea><br>
+  <button type="submit">Send</button>
+</form>
+</div>
+    {% include 'properties/elements/footer.html' %}
+</body>

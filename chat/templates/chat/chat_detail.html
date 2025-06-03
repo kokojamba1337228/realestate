@@ -32,7 +32,7 @@
             {% csrf_token %}
             <div class="send-container">
             <textarea name="message" placeholder="Напишите сообщение..." required></textarea>
-            <button type="submit">Отправить</button>
+            <button type="submit">➤</button>
             </div>
         </form>
     </div>
@@ -47,7 +47,23 @@
                 event.preventDefault();
                 submitForm();
             });
-        
+            .then((data) => {
+                const emptyMsg = messagesContainer.querySelector("p");
+                if (emptyMsg && emptyMsg.textContent.includes("Нет сообщений")) {
+                    emptyMsg.remove();
+                }
+            
+                const newMessage = document.createElement("div");
+                newMessage.classList.add("message", "sent");
+                newMessage.innerHTML = `
+                    <p><strong>${data.sender}:</strong> ${data.content}</p>
+                    <p><small>${data.created_at}</small></p>
+                `;
+                messagesContainer.appendChild(newMessage);
+                textarea.value = ""; 
+                messagesContainer.scrollTop = messagesContainer.scrollHeight; 
+            })
+            
             textarea.addEventListener("keydown", (event) => {
                 if (event.key === "Enter") {
                     if (event.shiftKey) {
